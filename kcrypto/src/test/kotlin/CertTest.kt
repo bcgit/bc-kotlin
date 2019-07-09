@@ -8,6 +8,7 @@ import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.Digest
 import org.bouncycastle.kcrypto.SigningKeyPair
+import org.bouncycastle.kcrypto.cert.CRL
 import org.bouncycastle.kcrypto.cert.Certificate
 import org.bouncycastle.kcrypto.cert.CertificateBuilder
 import org.bouncycastle.kcrypto.cert.dsl.*
@@ -19,17 +20,14 @@ import org.bouncycastle.kcrypto.pkcs.dsl.attributes
 import org.bouncycastle.kcrypto.pkcs.dsl.pkcs10Request
 import org.bouncycastle.kcrypto.spec.asymmetric.ECDSASigSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.ECGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.PKCS1SigSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.security.cert.CertPathValidator
-import java.security.cert.CertificateFactory
-import java.security.cert.TrustAnchor
-import java.security.cert.X509Certificate
+import java.math.BigInteger
 import java.util.*
+import kotlin.experimental.xor
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -49,8 +47,6 @@ class CertTest {
     init {
 
         initProvider()
-
-
 
         taKP = KCryptoServices.signingKeyPair(ECGenSpec("P-256"))
 
@@ -83,6 +79,96 @@ class CertTest {
             rdn(BCStyle.CN, "Sir Robert Peel")
             rdn(BCStyle.EmailAddress, "bobbies@bouncycastle.org")
         }
+    }
+
+    @Test
+    fun `create crl`() {
+
+        var expDate = Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000)
+
+        var name = x500Name {
+            rdn(BCStyle.C, "AU")
+            rdn(BCStyle.O, "The Legion of the Bouncy Castle")
+            rdn(BCStyle.L, "Melbourne")
+            rdn(BCStyle.CN, "Eric H. Echidna")
+            rdn(BCStyle.EmailAddress, "feedback-crypto@bouncycastle.org")
+        }
+
+
+        val cert = certificate {
+            serialNumber = BigInteger.valueOf(1)
+            issuer = name
+            notAfter = expDate
+            subject = name
+            subjectPublicKey = caKP.verificationKey
+
+            signature {
+                ECDSA with sha256 using caKP.signingKey
+            }
+        }
+
+
+        val exts = extensions {
+            authorityKeyIdentifierExtension {
+                authorityKey = cert
+            }
+        }
+
+
+        val crl = crl {
+            issuer = cert
+
+            revocation {
+                userCert = BigInteger.ONE
+                reason = certificateHold
+            }
+            revocation {
+                userCert = cert
+                reason = keyCompromise
+            }
+
+            extensions = exts
+
+            signature {
+                ECDSA with sha256 using caKP.signingKey
+            }
+        }
+
+        //
+        // Basic verification test.
+        //
+        assertTrue(crl.signatureVerifiedBy(cert))
+
+        // Vandalise CRL.
+        val enc = crl.encoding
+
+        // We need a location that corrupts data rather than ASN1 Structure.
+        enc[10] = enc[10] xor 1
+        assertFalse(CRL(enc).signatureVerifiedBy(cert))
+
+        val resCRL = CRL(crl.encoding)
+        assertArrayEquals(crl.extensions.encoded, resCRL.extensions.encoded)
+        assertArrayEquals(crl.issuer.encoded, resCRL.issuer.encoded)
+        assertTrue(crl.signatureVerifiedBy(caKP.verificationKey))
+
+
+        var left = crl.findEntryForRevokedCertificate(BigInteger.ONE)!!
+        var right = resCRL.findEntryForRevokedCertificate(BigInteger.ONE)!!
+        assertEquals(left.serialNumber, right.serialNumber)
+        assertEquals(left.revocationDate, right.revocationDate)
+        assertEquals(left.hasExtensions, right.hasExtensions)
+        assertArrayEquals(left.extensions.encoded, right.extensions.encoded)
+
+
+
+        left = crl.findEntryForRevokedCertificate(cert.serialNumber)!!
+        right = resCRL.findEntryForRevokedCertificate(cert.serialNumber)!!
+        assertEquals(left.serialNumber, right.serialNumber)
+        assertEquals(left.revocationDate, right.revocationDate)
+        assertEquals(left.hasExtensions, right.hasExtensions)
+        assertArrayEquals(left.extensions.encoded, right.extensions.encoded)
+
+
     }
 
 
@@ -166,39 +252,39 @@ class CertTest {
     fun `test x500Name`() {
 
         val fields = listOf<ASN1ObjectIdentifier>(
-            BCStyle.C,
-            BCStyle.O,
-            BCStyle.OU,
-            BCStyle.T,
-            BCStyle.CN,
-            BCStyle.SN,
-            BCStyle.STREET,
-            BCStyle.SERIALNUMBER,
-            BCStyle.L,
-            BCStyle.ST,
-            BCStyle.SURNAME,
-            BCStyle.GIVENNAME,
-            BCStyle.INITIALS,
-            BCStyle.GENERATION,
-            BCStyle.UNIQUE_IDENTIFIER,
-            BCStyle.BUSINESS_CATEGORY,
-            BCStyle.POSTAL_CODE,
-            BCStyle.DN_QUALIFIER,
-            BCStyle.PSEUDONYM,
-            BCStyle.PLACE_OF_BIRTH,
-            BCStyle.GENDER,
-            BCStyle.COUNTRY_OF_CITIZENSHIP,
-            BCStyle.COUNTRY_OF_RESIDENCE,
-            BCStyle.POSTAL_ADDRESS,
-            BCStyle.DMD_NAME,
-            BCStyle.TELEPHONE_NUMBER,
-            BCStyle.NAME,
-            BCStyle.EmailAddress,
-            BCStyle.UnstructuredName,
-            BCStyle.UnstructuredAddress,
-            BCStyle.E,
-            BCStyle.DC,
-            BCStyle.UID
+                BCStyle.C,
+                BCStyle.O,
+                BCStyle.OU,
+                BCStyle.T,
+                BCStyle.CN,
+                BCStyle.SN,
+                BCStyle.STREET,
+                BCStyle.SERIALNUMBER,
+                BCStyle.L,
+                BCStyle.ST,
+                BCStyle.SURNAME,
+                BCStyle.GIVENNAME,
+                BCStyle.INITIALS,
+                BCStyle.GENERATION,
+                BCStyle.UNIQUE_IDENTIFIER,
+                BCStyle.BUSINESS_CATEGORY,
+                BCStyle.POSTAL_CODE,
+                BCStyle.DN_QUALIFIER,
+                BCStyle.PSEUDONYM,
+                BCStyle.PLACE_OF_BIRTH,
+                BCStyle.GENDER,
+                BCStyle.COUNTRY_OF_CITIZENSHIP,
+                BCStyle.COUNTRY_OF_RESIDENCE,
+                BCStyle.POSTAL_ADDRESS,
+                BCStyle.DMD_NAME,
+                BCStyle.TELEPHONE_NUMBER,
+                BCStyle.NAME,
+                BCStyle.EmailAddress,
+                BCStyle.UnstructuredName,
+                BCStyle.UnstructuredAddress,
+                BCStyle.E,
+                BCStyle.DC,
+                BCStyle.UID
         )
 
 
@@ -238,11 +324,50 @@ class CertTest {
 
         val expDate = Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000)
 
+
+        val ext = extensions {
+            critical(extension {
+                extOid = Extension.basicConstraints
+                extValue = BasicConstraints(true)
+            })
+            critical(extension {
+                extOid = Extension.keyUsage
+                extValue = KeyUsage(KeyUsage.keyCertSign or KeyUsage.cRLSign)
+            })
+            subjectKeyIdentifierExtension {
+                subjectKey = caKP.verificationKey
+            }
+        }
+
         val selfSigned = with(CertificateBuilder(caKP.signingKey, ECDSASigSpec(Digest.SHA256), caDN))
         {
             this.setNotBefore(java.util.Date())
-                .setNotAfter(expDate)
-                .build(java.math.BigInteger.valueOf(7), caKP.verificationKey)
+                    .setNotAfter(expDate)
+                    .setExtensions(ext)
+                    .build(java.math.BigInteger.valueOf(7), caKP.verificationKey)
+        }
+
+
+        val certRes = Certificate(selfSigned.encoding)
+
+        assertArrayEquals(ext.encoded, certRes._cert.extensions.encoded)
+
+    }
+
+    @Test
+    fun `selfsigned cert with extensions`() {
+
+        val expDate = Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000)
+
+        val selfSigned = with(CertificateBuilder(caKP.signingKey, ECDSASigSpec(Digest.SHA256), caDN))
+        {
+            this.setNotBefore(java.util.Date())
+                    .setNotAfter(expDate)
+
+
+                    .build(java.math.BigInteger.valueOf(7), caKP.verificationKey)
+
+
         }
 
 
@@ -251,6 +376,7 @@ class CertTest {
         assertTrue(caDN.equals(certRes.subject))
 
     }
+
 
     @Test
     @Disabled("needs kotlin certpath api")
@@ -261,17 +387,17 @@ class CertTest {
         val ta = with(CertificateBuilder(taKP.signingKey, ECDSASigSpec(Digest.SHA256), taDN))
         {
             this.setNotBefore(java.util.Date())
-                .setNotAfter(expDate)
-                .setExtensions(extensions {
-                    basicConstraintsExtension { BasicConstraints(true) }
-                    subjectKeyIdentifierExtension {
-                        subjectKey = taKP.verificationKey
-                    }
-                    authorityKeyIdentifierExtension {
-                        authorityKey = taKP.verificationKey
-                    }
-                })
-                .build(java.math.BigInteger.valueOf(7), taDN, taKP.verificationKey)
+                    .setNotAfter(expDate)
+                    .setExtensions(extensions {
+                        basicConstraintsExtension { BasicConstraints(true) }
+                        subjectKeyIdentifierExtension {
+                            subjectKey = taKP.verificationKey
+                        }
+                        authorityKeyIdentifierExtension {
+                            authorityKey = taKP.verificationKey
+                        }
+                    })
+                    .build(java.math.BigInteger.valueOf(7), taDN, taKP.verificationKey)
         }
 
 
@@ -289,7 +415,7 @@ class CertTest {
                     authorityKey = ta
                 }
             })
-                .build(java.math.BigInteger.valueOf(7), caDN, caKP.verificationKey)
+                    .build(java.math.BigInteger.valueOf(7), caDN, caKP.verificationKey)
         }
 
 
@@ -306,7 +432,7 @@ class CertTest {
                     authorityKey = ca
                 }
             })
-                .build(java.math.BigInteger.valueOf(7), endDN, endKp.verificationKey)
+                    .build(java.math.BigInteger.valueOf(7), endDN, endKp.verificationKey)
         }
 
 
