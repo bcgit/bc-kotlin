@@ -29,6 +29,8 @@ class Certificate(encoding: ByteArray): Encodable
 
     val subjectPublicKeyInfo get() = _cert.subjectPublicKeyInfo
 
+    val extensions get() = _cert.extensions
+
     override val encoding: ByteArray = _cert.encoded
 
     /**
