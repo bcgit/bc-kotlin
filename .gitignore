@@ -1,0 +1,6 @@
+.idea
+.gradle
+out
+build
+kcrypto/build
+examples/build
