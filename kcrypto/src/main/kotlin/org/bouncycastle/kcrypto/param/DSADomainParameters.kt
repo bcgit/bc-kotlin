@@ -35,21 +35,18 @@ class DSADomainParameters {
         this.validationParameters = params
     }
 
-    override fun equals(
-            obj: Any?): Boolean {
-        if (obj !is DSADomainParameters) {
-            return false
+    override fun equals(other: Any?): Boolean {
+        if (other is DSADomainParameters) {
+            return other.p.equals(p) && other.q.equals(q) && other.g.equals(g)
         }
 
-        val pm = obj as DSADomainParameters?
-
-        return pm!!.p == p && pm.q == q && pm.g == g
+        return false
     }
 
     override fun hashCode(): Int {
-        var result = g!!.hashCode()
-        result = 31 * result + p!!.hashCode()
-        result = 31 * result + q!!.hashCode()
+        var result = g.hashCode()
+        result = 31 * result + p.hashCode()
+        result = 31 * result + q.hashCode()
         return result
     }
 
@@ -114,21 +111,14 @@ class DSAValidationParameters(private val _seed: ByteArray, val counter: Int = -
         return code
     }
 
-    override fun equals(
-            o: Any?): Boolean {
-        if (o !is DSAValidationParameters) {
-            return false
+    override fun equals(other: Any?): Boolean {
+        if (other is DSAValidationParameters) {
+
+            return (this.counter == other.counter)
+                    && (this.usageIndex == other.usageIndex)
+                    && Arrays.areEqual(this.seed, other.seed)
         }
 
-        val other = o as DSAValidationParameters?
-
-        if (other!!.counter != this.counter) {
-            return false
-        }
-
-        return if (other.usageIndex != this.usageIndex) {
-            false
-        } else Arrays.areEqual(this.seed, other.seed)
-
+        return false
     }
 }

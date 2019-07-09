@@ -5,7 +5,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.kcrypto.spec.symmetric.AESGenSpec
 import org.bouncycastle.kcrypto.spec.symmetric.CCMSpec
 import org.bouncycastle.util.Arrays
-//import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -13,7 +12,9 @@ import org.junit.jupiter.api.TestInstance
 import java.io.ByteArrayOutputStream
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
-import java.security.Security
+import javax.crypto.Cipher
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import kotlin.experimental.xor
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -234,7 +235,7 @@ public class CCMTest {
                 //
 
                 val cipherTextStream = ByteArrayOutputStream().apply {
-                    encryptor(CCMSpec(IV, 16)).outputEncryptor(this).apply {
+                    encryptor(CCMSpec(IV, 128)).outputEncryptor(this).apply {
                         aadStream.write(aad)
                         encStream.use {
                             it.write(message)
@@ -242,9 +243,8 @@ public class CCMTest {
                     }
                 }
 
-
                 val plainTextStream = ByteArrayOutputStream().apply {
-                    decryptor(CCMSpec(IV, 16)).outputDecryptor(this).apply {
+                    decryptor(CCMSpec(IV, 128)).outputDecryptor(this).apply {
                         aadStream.write(aad)
                         decStream.use {
                             it.write(cipherTextStream.toByteArray())
@@ -253,8 +253,15 @@ public class CCMTest {
                     }
                 }
 
-
                 assertTrue(Arrays.areEqual(message, plainTextStream.toByteArray()))
+
+                val c = Cipher.getInstance("CCM", KCryptoServices._provider)
+
+                c.init(Cipher.DECRYPT_MODE, SecretKeySpec(this.encoding, "AES"), GCMParameterSpec(128, IV))
+
+                c.updateAAD(aad)
+                
+                assertTrue(Arrays.areEqual(message, c.doFinal(cipherTextStream.toByteArray())))
             }
 
 

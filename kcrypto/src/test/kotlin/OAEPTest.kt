@@ -1,7 +1,6 @@
 import org.bouncycastle.kcrypto.Digest
 import org.bouncycastle.kcrypto.KeyType
 import org.bouncycastle.kcrypto.spec.asymmetric.OAEPSpec
-import org.bouncycastle.util.encoders.Hex
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -12,6 +11,7 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.spec.RSAPrivateCrtKeySpec
 import java.security.spec.RSAPublicKeySpec
+import javax.crypto.Cipher
 import kotlin.experimental.xor
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -79,6 +79,14 @@ class OAEPTest {
 
         assertArrayEquals(input, res)
 
+        val c = Cipher.getInstance("RSA/NONE/OAEPwithSHA1andMGF1Padding", KCryptoServices._provider)
+
+        c.init(Cipher.DECRYPT_MODE, privKey)
+
+        val jceRes = c.doFinal(ct)
+
+        assertArrayEquals(input, jceRes)
+
         ct[0] = ct[0] xor 1
 
         try {
@@ -109,6 +117,14 @@ class OAEPTest {
 
         assertArrayEquals(input, res)
 
+        val c = Cipher.getInstance("RSA/NONE/OAEPwithSHA224andMGF1Padding", KCryptoServices._provider)
+
+        c.init(Cipher.DECRYPT_MODE, priv2048Key)
+
+        val jceRes = c.doFinal(ct)
+
+        assertArrayEquals(input, jceRes)
+
         ct[0] = ct[0] xor 1
 
         try {
@@ -137,6 +153,14 @@ class OAEPTest {
                 .decrypt(ct)
 
         assertArrayEquals(input, res)
+
+        val c = Cipher.getInstance("RSA/NONE/OAEPwithSHA256andMGF1Padding", KCryptoServices._provider)
+
+        c.init(Cipher.DECRYPT_MODE, priv2048Key)
+
+        val jceRes = c.doFinal(ct)
+
+        assertArrayEquals(input, jceRes)
 
         ct[0] = ct[0] xor 1
 
@@ -168,6 +192,14 @@ class OAEPTest {
 
         assertArrayEquals(input, res)
 
+        val c = Cipher.getInstance("RSA/NONE/OAEPwithSHA384andMGF1Padding", KCryptoServices._provider)
+
+        c.init(Cipher.DECRYPT_MODE, priv2048Key)
+
+        val jceRes = c.doFinal(ct)
+
+        assertArrayEquals(input, jceRes)
+        
         ct[0] = ct[0] xor 1
 
         try {
@@ -198,6 +230,13 @@ class OAEPTest {
 
         assertArrayEquals(input, res)
 
+        val c = Cipher.getInstance("RSA/NONE/OAEPwithSHA512andMGF1Padding", KCryptoServices._provider)
+
+        c.init(Cipher.DECRYPT_MODE, priv2048Key)
+
+        val jceRes = c.doFinal(ct)
+
+        assertArrayEquals(input, jceRes)
 
         ct[0] = ct[0] xor 1
 

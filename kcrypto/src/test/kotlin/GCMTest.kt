@@ -1,13 +1,14 @@
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.kcrypto.spec.symmetric.AESGenSpec
 import org.bouncycastle.kcrypto.spec.symmetric.GCMSpec
-
 import org.bouncycastle.util.Arrays
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.io.ByteArrayOutputStream
-import java.security.Security
+import javax.crypto.Cipher
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import kotlin.experimental.xor
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -88,6 +89,14 @@ public class GCMTest {
             }
 
             assertTrue(Arrays.areEqual(message, plainTextStream.toByteArray()))
+
+            val c = Cipher.getInstance("GCM", KCryptoServices._provider)
+
+            c.init(Cipher.DECRYPT_MODE, SecretKeySpec(this.encoding, "AES"), GCMParameterSpec(128, IV))
+
+            c.updateAAD(aad)
+
+            assertTrue(Arrays.areEqual(message, c.doFinal(cipherTextStream.toByteArray())))
         }
     }
 

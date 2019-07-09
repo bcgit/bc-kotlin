@@ -1,10 +1,11 @@
 import org.bouncycastle.kcrypto.Digest
+import org.bouncycastle.util.Arrays
 import org.bouncycastle.util.Strings
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.security.Security
+import java.security.MessageDigest
 import kotlin.experimental.xor
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -31,8 +32,12 @@ class DigestTest {
             val verifier = digest.digestVerifier().apply {
                 this.stream.use { it.write(msg) }
             }
-            assertTrue(verifier.verify(calculator.digest()))
+            val expected = calculator.digest()
+            assertTrue(verifier.verify(expected))
 
+            val jcaDig = MessageDigest.getInstance(digest.algorithmName)
+
+            assertTrue(Arrays.areEqual(expected, jcaDig.digest(msg)))
         }
 
     }

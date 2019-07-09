@@ -22,7 +22,7 @@ class MacTest {
 
         specs.forEach { spec ->
             KCryptoServices.secureRandom.nextBytes(input)
-            val key = KCryptoServices.macKey(spec)
+            val key = KCryptoServices.authenticationKey(spec)
 
             val code = key.macCalculator(HMacSpec()).apply {
                 stream.use { it.write(input) }
@@ -40,10 +40,9 @@ class MacTest {
     @Test
     fun `non decode`() {
         val input = ByteArray(100)
-        var ctr = 1;
         for (spec in specs) {
             KCryptoServices.secureRandom.nextBytes(input)
-            val keyIn = KCryptoServices.macKey(spec)
+            val keyIn = KCryptoServices.authenticationKey(spec)
 
 
             val code = keyIn.macCalculator(HMacSpec()).apply {
@@ -56,7 +55,7 @@ class MacTest {
                     continue
                 }
 
-                val keyOut = KCryptoServices.macKey(wrongSpec)
+                val keyOut = KCryptoServices.authenticationKey(wrongSpec)
                 assertFalse(
                     keyOut.macVerifier(HMacSpec()).apply {
                         stream.use { it.write(input) }
@@ -242,7 +241,7 @@ class MacTest {
 
             with(vector.value) {
                 //                val vec = this
-                val key = KCryptoServices.macKey(this.key, this.spec.authType)
+                val key = KCryptoServices.authenticationKey(this.key, this.spec.authType)
                 val res = key.macVerifier(HMacSpec()).apply {
                     stream.use { str ->
                         (0..this@with.rounds - 1).forEach { _ ->

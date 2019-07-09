@@ -101,6 +101,13 @@ class KCryptoServices {
             throw IllegalArgumentException("unknown KeyGenSpec")
         }
 
+        /**
+         * Create a public key for signature verification from a DER byte representation.
+         *
+         * @param encodedKey the DER encoding of the key.
+         * @param keyType the type of the key to return.
+         * @return a VerificationKey
+         */
         fun verificationKey(encodedKey: ByteArray, keyType: KeyType<VerificationKey>): VerificationKey {
             var algorithm = if (keyType.algorithm.equals("Verification"))
                                 SubjectPublicKeyInfo.getInstance(encodedKey).algorithm.algorithm.id else keyType.algorithm
@@ -109,6 +116,13 @@ class KCryptoServices {
             return BaseVerificationKey(kf.generatePublic(X509EncodedKeySpec(encodedKey)))
         }
 
+        /**
+         * Create a public key for message encryption from a DER byte representation.
+         *
+         * @param encodedKey the DER encoding of the key.
+         * @param keyType the type of the key to return.
+         * @return an EncryptionKey
+         */
         fun encryptionKey(encodedKey: ByteArray, keyType: KeyType<EncryptionKey>): EncryptionKey {
             var algorithm = if (keyType.algorithm.equals("Encryption"))
                                 SubjectPublicKeyInfo.getInstance(encodedKey).algorithm.algorithm.id else keyType.algorithm
@@ -117,6 +131,13 @@ class KCryptoServices {
             return BaseEncryptionKey(kf.generatePublic(X509EncodedKeySpec(encodedKey)))
         }
 
+        /**
+         * Create a private key for signature creation from a DER byte representation.
+         *
+         * @param encodedKey the DER encoding of the key.
+         * @param keyType the type of the key to return.
+         * @return an SigningKey
+         */
         fun signingKey(encodedKey: ByteArray, keyType: KeyType<SigningKey>): SigningKey {
             var algorithm = if (keyType.algorithm.equals("Signing"))
                 PrivateKeyInfo.getInstance(encodedKey).privateKeyAlgorithm.algorithm.id else keyType.algorithm
@@ -125,6 +146,13 @@ class KCryptoServices {
             return BaseSigningKey(kf.generatePrivate(PKCS8EncodedKeySpec(encodedKey)))
         }
 
+        /**
+         * Create a private key for message decryption from a DER byte representation.
+         *
+         * @param encodedKey the DER encoding of the key.
+         * @param keyType the type of the key to return.
+         * @return a DecryptionKey
+         */
         fun decryptionKey(encodedKey: ByteArray, keyType: KeyType<DecryptionKey>): DecryptionKey {
             var algorithm = if (keyType.algorithm.equals("Decryption"))
                             PrivateKeyInfo.getInstance(encodedKey).privateKeyAlgorithm.algorithm.id else keyType.algorithm
@@ -133,6 +161,12 @@ class KCryptoServices {
             return BaseDecryptionKey(kf.generatePrivate(PKCS8EncodedKeySpec(encodedKey)))
         }
 
+        /**
+         * Generate a general purpose symmetric key.
+         *
+         * @param keyGenSpec specification for symmetric key to generate.
+         * @return a new symmetric key.
+         */
         fun symmetricKey(keyGenSpec: KeyGenSpec): SymmetricKey {
             if (keyGenSpec is AESGenSpec) {
                 val kpGen = helper.createKeyGenerator("AES");
@@ -144,10 +178,24 @@ class KCryptoServices {
             throw IllegalArgumentException("unknown KeyGenSpec")
         }
 
+        /**
+         * Create a general purpose symmetric key from a raw byte representation.
+         *
+         * @param rawKey the key bytes.
+         * @param keyType the type of the key to return.
+         * @return a SymmetricKey
+         */
         fun symmetricKey(rawKey: ByteArray, keyType: KeyType<SymmetricKey>): SymmetricKey {
             return BaseSymmetricKey(rawKey.size * 8, SecretKeySpec(rawKey, keyType.algorithm))
         }
 
+        /**
+         * Return a password based KDF operator based on the passed in specifications.
+         *
+         * @param kdfConfig details of the PBKDF to use for key generation.
+         * @param keySpec specification for the key to be generated.
+         * @return a PBKDF operator.
+         */
         fun pbkdf(kdfConfig: PBKDFAlgSpec<AlgorithmIdentifier>, keySpec: KeyGenSpec): PBKDF {
             if (kdfConfig is ScryptSpec) {
                 val skdf = kdfConfig
@@ -162,7 +210,13 @@ class KCryptoServices {
             throw IllegalArgumentException("unknown PBKDF requested")
         }
 
-        fun macKey(keyGenSpec: AuthGenSpec): AuthenticationKey {
+        /**
+         * Generate a symmetric key for use with MAC generation only.
+         *
+         * @param keyGenSpec specification for symmetric key to generate.
+         * @return a new authentication key.
+         */
+        fun authenticationKey(keyGenSpec: AuthGenSpec): AuthenticationKey {
             val keyType: KeyType<out Any> = keyGenSpec.authType
 
             val keySize = when (keyGenSpec) {
@@ -186,7 +240,14 @@ class KCryptoServices {
             }
         }
 
-        fun macKey(rawKey: ByteArray, keyType: KeyType<AuthenticationKey>): AuthenticationKey {
+        /**
+         * Create a symmetric key from a raw byte representation for use with MAC generation only.
+         *
+         * @param rawKey the key bytes.
+         * @param keyType the type of the key to return.
+         * @return an AuthenticationKey
+         */
+        fun authenticationKey(rawKey: ByteArray, keyType: KeyType<AuthenticationKey>): AuthenticationKey {
             if (keyType.algorithm.startsWith("HMac", true)) {
                 return BaseHMacKey(rawKey.size * 8,
                         SecretKeySpec(rawKey, keyType.algorithm), keyType)

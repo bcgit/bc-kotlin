@@ -162,7 +162,6 @@ open class V2CRLBuilder {
      * @return the current builder.
      */
     fun addCRL(other: CRL): V2CRLBuilder {
-        val revocations = other._crl.toASN1Structure().tbsCertList
 
         crlBuilder.addCRL(other._crl)
 
