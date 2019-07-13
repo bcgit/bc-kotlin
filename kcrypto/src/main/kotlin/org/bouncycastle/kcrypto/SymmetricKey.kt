@@ -88,7 +88,7 @@ private class SymKeyWrapper(algSpec: AlgSpec<AlgorithmIdentifier>, key: Key) : K
     }
 
     override fun wrap(key: SigningKey): ByteArray {
-        return cipher.wrap((key as BaseSigningKey).privKey)
+        return cipher.wrap((key as BaseSigningKey)._privKey)
     }
 }
 

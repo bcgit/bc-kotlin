@@ -52,7 +52,7 @@ internal class BaseWrapper(algorithm: AlgSpec<AlgorithmIdentifier>, pubKey: Publ
     }
 
     override fun wrap(key: SigningKey): ByteArray {
-        return cipher.wrap((key as BaseSigningKey).privKey)
+        return cipher.wrap((key as BaseSigningKey)._privKey)
     }
 }
 

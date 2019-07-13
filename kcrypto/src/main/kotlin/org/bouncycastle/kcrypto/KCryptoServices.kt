@@ -10,6 +10,7 @@ import org.bouncycastle.kcrypto.internal.ScryptPbKdf
 import org.bouncycastle.kcrypto.spec.*
 import org.bouncycastle.kcrypto.spec.asymmetric.DSAGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.ECGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.EdDSAGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
 import org.bouncycastle.kcrypto.spec.kdf.PBKDF2Spec
 import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
@@ -69,21 +70,31 @@ class KCryptoServices {
          * @return a new key pair for creating and verifying signatures.
          */
         fun signingKeyPair(keyGenSpec: SignGenSpec): SigningKeyPair {
-            if (keyGenSpec is RSAGenSpec) {
-                val kpGen = helper.createKeyPairGenerator("RSA");
-                kpGen.initialize(RSAKeyGenParameterSpec(keyGenSpec.keySize, keyGenSpec.publicExponent), keyGenSpec.random)
-                return SigningKeyPair(KeyPair(kpGen.generateKeyPair()));
-            } else if (keyGenSpec is ECGenSpec) {
-                val ecGen = helper.createKeyPairGenerator("EC")
-                ecGen.initialize(ECGenParameterSpec(keyGenSpec.name), keyGenSpec.random)
-                return SigningKeyPair(KeyPair(ecGen.genKeyPair()))
-            } else if (keyGenSpec is DSAGenSpec) {
-                val dsaGen = helper.createKeyPairGenerator("DSA")
-                val dsaSpec = DSAParameterSpec(keyGenSpec.domainParameters.p, keyGenSpec.domainParameters.q, keyGenSpec.domainParameters.g)
-                dsaGen.initialize(dsaSpec, keyGenSpec.random)
-                return SigningKeyPair(KeyPair(dsaGen.genKeyPair()))
+            when (keyGenSpec) {
+                is RSAGenSpec -> {
+                    val kpGen = helper.createKeyPairGenerator("RSA");
+                    kpGen.initialize(RSAKeyGenParameterSpec(keyGenSpec.keySize, keyGenSpec.publicExponent), keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(kpGen.generateKeyPair()));
+                }
+                is ECGenSpec -> {
+                    val ecGen = helper.createKeyPairGenerator("EC")
+                    ecGen.initialize(ECGenParameterSpec(keyGenSpec.curveName), keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(ecGen.genKeyPair()))
+                }
+                is EdDSAGenSpec -> {
+                    val edGen = helper.createKeyPairGenerator("EDDSA")
+                    edGen.initialize(ECGenParameterSpec(keyGenSpec.curveName), keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(edGen.genKeyPair()))
+                }
+                is DSAGenSpec -> {
+                    val dsaGen = helper.createKeyPairGenerator("DSA")
+                    val dsaSpec = DSAParameterSpec(keyGenSpec.domainParameters.p, keyGenSpec.domainParameters.q, keyGenSpec.domainParameters.g)
+                    dsaGen.initialize(dsaSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(dsaGen.genKeyPair()))
+                }
+                else ->
+                    throw IllegalArgumentException("unknown KeyGenSpec")
             }
-            throw IllegalArgumentException("unknown KeyGenSpec")
         }
 
         /**

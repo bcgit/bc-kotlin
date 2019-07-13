@@ -6,6 +6,7 @@ import org.bouncycastle.kcrypto.param.DSADomainParameters
 import org.bouncycastle.kcrypto.spec.SignPairGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.DSAGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.ECGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.EdDSAGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
 import java.math.BigInteger
 import java.security.Provider
@@ -66,13 +67,23 @@ fun SigningKeyBuilder.ec(block: EcParams.() -> Unit) {
 }
 
 /**
- * Initialize an EC Key pair
+ * Initialize an DSA Key pair
  * @param block initialization block.
  */
 fun SigningKeyBuilder.dsa(block: DsaParams.() -> Unit) {
     val p = DsaParams().apply(block)
 
     setSpec(DSAGenSpec(p.domainParameters, KCryptoServices.secureRandom))
+}
+
+/**
+ * Initialize an EdDSA Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.edDsa(block: EdDsaParams.() -> Unit) {
+    val p = EdDsaParams().apply(block)
+
+    setSpec(EdDSAGenSpec(p.curveName, KCryptoServices.secureRandom))
 }
 
 /**
@@ -88,10 +99,14 @@ data class RsaParams(
 /**
  * EC Parameters
  */
-data class EcParams(var curveName: String = "P-256") {
-}
+data class EcParams(var curveName: String = "P-256")
 
 /**
  * DSA Parameters
  */
 data class DsaParams(var domainParameters: DSADomainParameters = DSADomainParameters.DEF_2048)
+
+/**
+ * EdDSA Parameters
+ */
+data class EdDsaParams(var curveName: String = "ED25519")

@@ -10,18 +10,28 @@ import org.bouncycastle.kcrypto.pkcs.PKCS10RequestBuilder
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.DSASigSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.ECDSASigSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.EdDSASigSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.PKCS1SigSpec
 
 
 interface SigType
 {
+}
+
+interface DigSigType: SigType
+{
     fun getSigAlgSpec(digest: Digest): SigAlgSpec
+}
+
+interface NoDigSigType: SigType
+{
+    fun getSigAlgSpec(): SigAlgSpec
 }
 
 /**
  * DSL for PKCS1 Signature type.
  */
-class PKCS1SigType: SigType
+class PKCS1SigType: DigSigType
 {
     override fun getSigAlgSpec(digest: Digest): SigAlgSpec {
         return PKCS1SigSpec(digest)
@@ -31,7 +41,7 @@ class PKCS1SigType: SigType
 /**
  * DSL for ECDSA signature type.
  */
-class ECDSASigType: SigType
+class ECDSASigType: DigSigType
 {
     override fun getSigAlgSpec(digest: Digest): SigAlgSpec {
         return ECDSASigSpec(digest)
@@ -41,10 +51,20 @@ class ECDSASigType: SigType
 /**
  * DSL for DSA signature type.
  */
-class DSASigType: SigType
+class DSASigType: DigSigType
 {
     override fun getSigAlgSpec(digest: Digest): SigAlgSpec {
         return DSASigSpec(digest)
+    }
+}
+
+/**
+ * DSL for EdDSA signature type.
+ */
+class EdDSASigType: NoDigSigType
+{
+    override fun getSigAlgSpec(): SigAlgSpec {
+        return EdDSASigSpec()
     }
 }
 
@@ -66,6 +86,7 @@ class SignatureBlock
     val PKCS1v1dot5 = SignatureDetails(this, PKCS1SigType())
     val ECDSA = SignatureDetails(this, ECDSASigType())
     val DSA = SignatureDetails(this, DSASigType())
+    val EdDSA = SignatureDetails(this, EdDSASigType())
 
     val sha224 = Digest.SHA224
     val sha256 = Digest.SHA256
@@ -78,8 +99,10 @@ class SignatureBlock
  */
 class SignatureDetails(val parent: SignatureBlock, val sigType: SigType)
 {
-    lateinit var digest: Digest
+
     lateinit var signingKey: SigningKey
+
+    var digest: Digest? = null
 
     infix fun with(digest: Digest): SignatureDetails {
 
@@ -90,12 +113,18 @@ class SignatureDetails(val parent: SignatureBlock, val sigType: SigType)
     }
 
     infix fun using(signingKey: SigningKey): SignatureDetails {
+        parent.signature = this;
         this.signingKey = signingKey
 
         return this
     }
 
     fun getSigAlgSpec(): SigAlgSpec {
-        return sigType.getSigAlgSpec(digest)
+        val dig = digest;
+        if (dig != null) {
+            return (sigType as DigSigType).getSigAlgSpec(dig)
+        } else {
+            return (sigType as NoDigSigType).getSigAlgSpec()
+        }
     }
 }

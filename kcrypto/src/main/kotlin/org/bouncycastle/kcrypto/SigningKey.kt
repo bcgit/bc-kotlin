@@ -3,10 +3,7 @@ package org.bouncycastle.kcrypto
 import KCryptoServices.Companion.helper
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.DSASigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.ECDSASigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.PKCS1SigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.PSSSigSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.*
 import java.io.OutputStream
 import java.security.PrivateKey
 import java.security.Signature
@@ -19,26 +16,33 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
     val sig: Signature
 
     init {
-        val algName: String
-        if (sigSpec is PKCS1SigSpec) {
-            algName = simplify(sigSpec.digest.algorithmName + "withRSA")
-        } else if (sigSpec is PSSSigSpec) {
-            algName = simplify(sigSpec.digest.algorithmName + "withRSAandMGF1")
-        } else if (sigSpec is ECDSASigSpec) {
-            algName = simplify(sigSpec.digest.algorithmName + "withECDSA")
-        } else if (sigSpec is DSASigSpec) {
-            algName = simplify(sigSpec.digest.algorithmName + "withDSA")
-        } else {
-            throw IllegalArgumentException("unknown SigAlgSpec")
+        val algName: String = when (sigSpec) {
+            is PKCS1SigSpec -> {
+                simplify(sigSpec.digest.algorithmName + "withRSA")
+            }
+            is PSSSigSpec -> {
+                simplify(sigSpec.digest.algorithmName + "withRSAandMGF1")
+            }
+            is ECDSASigSpec -> {
+                simplify(sigSpec.digest.algorithmName + "withECDSA")
+            }
+            is EdDSASigSpec -> {
+                sigSpec.algorithmIdentifier.algorithm.id
+            }
+            is DSASigSpec -> {
+                simplify(sigSpec.digest.algorithmName + "withDSA")
+            }
+            else ->
+                throw IllegalArgumentException("unknown SigAlgSpec")
         }
 
         sig = helper.createSignature(algName)
 
-        sig.initSign(signingKey.privKey)
+        sig.initSign(signingKey._privKey)
 
         stream = SigningStream(sig)
               
-        algorithmIdentifier = sigSpec.validatedSpec(signingKey).algorithmIdentifier
+        algorithmIdentifier = sigSpec.algorithmIdentifier
     }
 
     private fun simplify(algorithmName: String): String
@@ -55,12 +59,12 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
     }
 }
 
-internal class BaseSigningKey(val privKey: PrivateKey) : SigningKey {
+internal class BaseSigningKey(internal val _privKey: PrivateKey) : SigningKey {
 
-    override val encoding = privKey.encoded
+    override val encoding get() = _privKey.encoded
 
     override fun signatureCalculator(sigAlgSpec: SigAlgSpec): SignatureCalculator<AlgorithmIdentifier> {
-        return BaseSigner(sigAlgSpec, this)
+        return BaseSigner(sigAlgSpec.validatedSpec(this), this)
     }
 }
 
