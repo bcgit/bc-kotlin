@@ -4,6 +4,7 @@ import KCryptoServices.Companion.helper
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.*
+import org.bouncycastle.util.Strings
 import java.io.OutputStream
 import java.security.PrivateKey
 import java.security.Signature
@@ -32,13 +33,21 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
             is DSASigSpec -> {
                 simplify(sigSpec.digest.algorithmName + "withDSA")
             }
+            is SM2SigSpec -> {
+                simplify(sigSpec.digest.algorithmName + "withSM2")
+            }
             else ->
                 throw IllegalArgumentException("unknown SigAlgSpec")
         }
 
         sig = helper.createSignature(algName)
 
-        sig.initSign(signingKey._privKey)
+        if (sigSpec is SM2SigSpec && sigSpec.id != null) {
+            sig.setParameter(convert(sigSpec.id))
+            sig.initSign(signingKey._privKey)
+        }  else {
+            sig.initSign(signingKey._privKey)
+        }
 
         stream = SigningStream(sig)
               

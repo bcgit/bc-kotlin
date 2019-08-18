@@ -2,10 +2,7 @@ package org.bouncycastle.kcrypto.cert
 
 import KCryptoServices
 import org.bouncycastle.cert.X509CertificateHolder
-import org.bouncycastle.kcrypto.Encodable
-import org.bouncycastle.kcrypto.EncryptionKey
-import org.bouncycastle.kcrypto.KeyType
-import org.bouncycastle.kcrypto.VerificationKey
+import org.bouncycastle.kcrypto.*
 import org.bouncycastle.kcrypto.internal.VerifierProv
 
 /**
@@ -41,9 +38,21 @@ class Certificate(encoding: ByteArray): Encodable
      */
     fun signatureVerifiedBy(cert: Certificate): Boolean
     {
+       return signatureVerifiedBy(cert, null)
+    }
+
+    /**
+     * Verify the signature on this certificate using the passed in certificate.
+     *
+     * @param cert the X.509 certificate that contains the public key to verify the signature on this certificate.
+     * @param id an ID string to associate with the signature generator.
+     * @return true if the certificate's signature is verified by the certificate's key, false otherwise.
+     */
+    fun signatureVerifiedBy(cert: Certificate, id: ID?): Boolean
+    {
         val holder = cert._cert
         return _cert.isSignatureValid(VerifierProv(
-                holder, cert.publicKey(KeyType.VERIFICATION.forAlgorithm(holder.subjectPublicKeyInfo.algorithm))))
+                holder, cert.publicKey(KeyType.VERIFICATION.forAlgorithm(holder.subjectPublicKeyInfo.algorithm)), id))
     }
 
     /**
@@ -54,7 +63,19 @@ class Certificate(encoding: ByteArray): Encodable
      */
     fun signatureVerifiedBy(pubKey: VerificationKey): Boolean
     {
-        return _cert.isSignatureValid(VerifierProv(null, pubKey))
+        return signatureVerifiedBy(pubKey, null)
+    }
+
+    /**
+     * Verify the signature on this certificate using the passed in public key.
+     *
+     * @param pubKey the public key to verify the signature on this certificate.
+     * @param id an ID string to associate with the signature generator.
+     * @return true if the certificate's signature is verified by the key, false otherwise.
+     */
+    fun signatureVerifiedBy(pubKey: VerificationKey, id: ID?): Boolean
+    {
+        return _cert.isSignatureValid(VerifierProv(null, pubKey, id))
     }
 
     /**

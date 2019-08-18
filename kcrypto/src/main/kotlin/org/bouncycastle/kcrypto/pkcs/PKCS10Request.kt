@@ -1,10 +1,7 @@
 package org.bouncycastle.kcrypto.pkcs
 
 import KCryptoServices
-import org.bouncycastle.kcrypto.Encodable
-import org.bouncycastle.kcrypto.EncryptionKey
-import org.bouncycastle.kcrypto.KeyType
-import org.bouncycastle.kcrypto.VerificationKey
+import org.bouncycastle.kcrypto.*
 import org.bouncycastle.kcrypto.cert.Certificate
 import org.bouncycastle.kcrypto.internal.VerifierProv
 import org.bouncycastle.pkcs.PKCS10CertificationRequest
@@ -14,8 +11,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest
  *
  * @param encoded a DER encoded PKCS#10 request.
  */
-class PKCS10Request(private val encoded: ByteArray) : Encodable
-{
+class PKCS10Request(private val encoded: ByteArray) : Encodable {
     internal var _request: PKCS10CertificationRequest
 
     init {
@@ -40,10 +36,19 @@ class PKCS10Request(private val encoded: ByteArray) : Encodable
      *
      * @return true if the request's signature is verified by the its own key, false otherwise.
      */
-    fun signatureVerifies(): Boolean
-    {
+    fun signatureVerifies(): Boolean {
+        return signatureVerifies(null)
+    }
+
+    /**
+     * Verify the signature on this PKCS#10 request using the public key contained in the request.
+     *
+     * @param id an ID string to associate with the signature generator.
+     * @return true if the request's signature is verified by the its own key, false otherwise.
+     */
+    fun signatureVerifies(id: ID?): Boolean {
         return _request.isSignatureValid(VerifierProv(null,
-                this.publicKey(KeyType.VERIFICATION.forAlgorithm(subjectPublicKeyInfo.algorithm))))
+                this.publicKey(KeyType.VERIFICATION.forAlgorithm(subjectPublicKeyInfo.algorithm)), id))
     }
 
     /**
@@ -52,10 +57,22 @@ class PKCS10Request(private val encoded: ByteArray) : Encodable
      * @param cert the X.509 certificate that contains the public key to verify the signature on this request.
      * @return true if the request's signature is verified by the certificate's key, false otherwise.
      */
-    fun signatureVerifiedBy(cert: Certificate): Boolean
+    fun signatureVerifiedBy(cert: Certificate): Boolean {
+        return signatureVerifiedBy(cert, null)
+    }
+
+    /**
+     * Verify the signature on this PKCS#10 request using the passed in certificate.
+     *
+     * @param cert the X.509 certificate that contains the public key to verify the signature on this request.
+     * @param id an ID string to associate with the signature generator.
+     * @return true if the request's signature is verified by the certificate's key, false otherwise.
+     */
+    fun signatureVerifiedBy(cert: Certificate, id: ID?): Boolean
     {
+        val holder = cert._cert
         return _request.isSignatureValid(VerifierProv(
-                cert._cert, cert.publicKey(KeyType.VERIFICATION.forAlgorithm(subjectPublicKeyInfo.algorithm))))
+                holder, cert.publicKey(KeyType.VERIFICATION.forAlgorithm(holder.subjectPublicKeyInfo.algorithm)), id))
     }
 
     /**
@@ -64,8 +81,18 @@ class PKCS10Request(private val encoded: ByteArray) : Encodable
      * @param pubKey the public key to verify the signature on this request.
      * @return true if the request's signature is verified by the key, false otherwise.
      */
-    fun signatureVerifiedBy(pubKey: VerificationKey): Boolean
-    {
-        return _request.isSignatureValid(VerifierProv(null, pubKey))
+    fun signatureVerifiedBy(pubKey: VerificationKey): Boolean {
+        return signatureVerifiedBy(pubKey, null)
+    }
+
+    /**
+     * Verify the signature on this PKCS#10 request using the passed in public key and ID.
+     *
+     * @param pubKey the public key to verify the signature on this request.
+     * @param id an ID string to associate with the signature generator.
+     * @return true if the request's signature is verified by the key, false otherwise.
+     */
+    fun signatureVerifiedBy(pubKey: VerificationKey, id: ID?): Boolean {
+        return _request.isSignatureValid(VerifierProv(null, pubKey, id))
     }
 }

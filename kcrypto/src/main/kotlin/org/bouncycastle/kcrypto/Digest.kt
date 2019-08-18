@@ -117,5 +117,6 @@ interface Digest
         val SHA256: Digest = BaseDigest("SHA-256", defDigestLookup.find("SHA-256"))
         val SHA384: Digest = BaseDigest("SHA-384", defDigestLookup.find("SHA-384"))
         val SHA512: Digest = BaseDigest("SHA-512", defDigestLookup.find("SHA-512"))
+        val SM3: Digest = BaseDigest("SM3", defDigestLookup.find("SM3"))
     }
 }

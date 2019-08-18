@@ -2,16 +2,11 @@ package org.bouncycastle.kcrypto.dsl
 
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
-import org.bouncycastle.kcrypto.Digest
-import org.bouncycastle.kcrypto.SignatureCalculator
-import org.bouncycastle.kcrypto.SigningKey
-import org.bouncycastle.kcrypto.VerificationKey
+import org.bouncycastle.kcrypto.*
 import org.bouncycastle.kcrypto.pkcs.PKCS10RequestBuilder
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.DSASigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.ECDSASigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.EdDSASigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.PKCS1SigSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.*
+import org.bouncycastle.util.Strings
 
 
 interface SigType
@@ -20,7 +15,7 @@ interface SigType
 
 interface DigSigType: SigType
 {
-    fun getSigAlgSpec(digest: Digest): SigAlgSpec
+    fun getSigAlgSpec(digest: Digest, id: ID?): SigAlgSpec
 }
 
 interface NoDigSigType: SigType
@@ -33,7 +28,7 @@ interface NoDigSigType: SigType
  */
 class PKCS1SigType: DigSigType
 {
-    override fun getSigAlgSpec(digest: Digest): SigAlgSpec {
+    override fun getSigAlgSpec(digest: Digest, id: ID?): SigAlgSpec {
         return PKCS1SigSpec(digest)
     }
 }
@@ -43,7 +38,7 @@ class PKCS1SigType: DigSigType
  */
 class ECDSASigType: DigSigType
 {
-    override fun getSigAlgSpec(digest: Digest): SigAlgSpec {
+    override fun getSigAlgSpec(digest: Digest, id: ID?): SigAlgSpec {
         return ECDSASigSpec(digest)
     }
 }
@@ -53,7 +48,7 @@ class ECDSASigType: DigSigType
  */
 class DSASigType: DigSigType
 {
-    override fun getSigAlgSpec(digest: Digest): SigAlgSpec {
+    override fun getSigAlgSpec(digest: Digest, id: ID?): SigAlgSpec {
         return DSASigSpec(digest)
     }
 }
@@ -65,6 +60,16 @@ class EdDSASigType: NoDigSigType
 {
     override fun getSigAlgSpec(): SigAlgSpec {
         return EdDSASigSpec()
+    }
+}
+
+/**
+ * DSL for SM2 signature type.
+ */
+class SM2SigType: DigSigType
+{
+    override fun getSigAlgSpec(digest: Digest, id: ID?): SigAlgSpec {
+        return SM2SigSpec(digest, id)
     }
 }
 
@@ -87,11 +92,14 @@ class SignatureBlock
     val ECDSA = SignatureDetails(this, ECDSASigType())
     val DSA = SignatureDetails(this, DSASigType())
     val EdDSA = SignatureDetails(this, EdDSASigType())
+    val SM2 = SignatureDetails(this, SM2SigType())
 
     val sha224 = Digest.SHA224
     val sha256 = Digest.SHA256
     val sha384 = Digest.SHA384
     val sha512 = Digest.SHA512
+    
+    val SM3 = Digest.SM3
 }
 
 /**
@@ -99,9 +107,9 @@ class SignatureBlock
  */
 class SignatureDetails(val parent: SignatureBlock, val sigType: SigType)
 {
-
     lateinit var signingKey: SigningKey
 
+    var id: ID? = null
     var digest: Digest? = null
 
     infix fun with(digest: Digest): SignatureDetails {
@@ -119,10 +127,17 @@ class SignatureDetails(val parent: SignatureBlock, val sigType: SigType)
         return this
     }
 
+    infix fun and(id: ID): SignatureDetails {
+        parent.signature = this;
+        this.id = id
+
+        return this
+    }
+
     fun getSigAlgSpec(): SigAlgSpec {
         val dig = digest;
         if (dig != null) {
-            return (sigType as DigSigType).getSigAlgSpec(dig)
+            return (sigType as DigSigType).getSigAlgSpec(dig, id)
         } else {
             return (sigType as NoDigSigType).getSigAlgSpec()
         }

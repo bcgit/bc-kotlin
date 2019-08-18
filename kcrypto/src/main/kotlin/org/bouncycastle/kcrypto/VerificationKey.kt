@@ -9,6 +9,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator
 import org.bouncycastle.kcrypto.cert.Certificate
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.SM2SigSpec
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder
 import java.io.OutputStream
 import java.security.AlgorithmParameters
@@ -19,12 +20,16 @@ import java.security.spec.X509EncodedKeySpec
 
 private class VerifierProvider {
 
+    private val id: ID?
     private val pubKey: PublicKey
     private val finder = DefaultAlgorithmNameFinder()
 
-    constructor(key: BaseVerificationKey) {
+    constructor(key: BaseVerificationKey, id: ID?) {
         pubKey = key._pubKey
+        this.id = id
     }
+
+    constructor(key: BaseVerificationKey): this(key, null)
 
     fun get(verifierAlgorithmIdentifier: AlgorithmIdentifier): SignatureVerifier<AlgorithmIdentifier> {
 
@@ -34,12 +39,14 @@ private class VerifierProvider {
                     RSASSAPSSparams.getInstance(verifierAlgorithmIdentifier.parameters).hashAlgorithm, verifierAlgorithmIdentifier),
                         verifierAlgorithmIdentifier, pubKey)
         } else {
-            return Verifier(finder.getAlgorithmName(verifierAlgorithmIdentifier), verifierAlgorithmIdentifier, pubKey)
+            return Verifier(finder.getAlgorithmName(verifierAlgorithmIdentifier), verifierAlgorithmIdentifier, pubKey, id)
         }
     }
 }
 
-private class Verifier(algorithm: String, algorithmIdentifier: AlgorithmIdentifier, pubKey: PublicKey) : SignatureVerifier<AlgorithmIdentifier> {
+private class Verifier(algorithm: String, algorithmIdentifier: AlgorithmIdentifier, pubKey: PublicKey, id: ID?) : SignatureVerifier<AlgorithmIdentifier> {
+
+    constructor(algorithm: String, algorithmIdentifier: AlgorithmIdentifier, pubKey: PublicKey): this(algorithm, algorithmIdentifier, pubKey, null)
 
     override val stream: OutputStream
     override val algorithmIdentifier: AlgorithmIdentifier
@@ -54,6 +61,9 @@ private class Verifier(algorithm: String, algorithmIdentifier: AlgorithmIdentifi
             var algP = AlgorithmParameters.getInstance(algorithmIdentifier.algorithm.id, KCryptoServices._provider)
             algP.init(params.toASN1Primitive().encoded)
             sig.setParameter(algP.getParameterSpec(AlgorithmParameterSpec::class.java))
+        }
+        if (id != null) {
+            sig.setParameter(convert(id))
         }
         sig.initVerify(pubKey)
 
@@ -97,6 +107,9 @@ internal class BaseVerificationKey: VerificationKey {
     }
 
     override fun signatureVerifier(sigAlgSpec: SigAlgSpec): SignatureVerifier<AlgorithmIdentifier> {
+        if (sigAlgSpec is SM2SigSpec) {
+            return VerifierProvider(this, sigAlgSpec.id).get(sigAlgSpec.validatedSpec(this).algorithmIdentifier)
+        }
         return VerifierProvider(this).get(sigAlgSpec.validatedSpec(this).algorithmIdentifier)
     }
 }
