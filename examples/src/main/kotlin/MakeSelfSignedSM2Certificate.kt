@@ -1,13 +1,13 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.kcrypto.ID
 import org.bouncycastle.kcrypto.cert.dsl.certificate
+import org.bouncycastle.kcrypto.cert.dsl.rdn
 import org.bouncycastle.kcrypto.cert.dsl.x500Name
 import org.bouncycastle.kcrypto.dsl.ec
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kutil.writePEMObject
-import org.bouncycastle.util.encoders.Hex
 import java.io.OutputStreamWriter
 import java.math.BigInteger
 import java.util.*
