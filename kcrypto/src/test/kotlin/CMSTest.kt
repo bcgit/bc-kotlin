@@ -22,7 +22,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.security.Security
 import java.util.*
 
 
@@ -271,10 +270,7 @@ class CMSTest {
         val certs = CollectionStore(certList)
         val crls = CollectionStore(crlList)
 
-        val infoGen = SignerInfoGenerator(origKP.signingKey, PKCS1SigSpec(Digest.SHA256), certList[0]).apply {
-            //withDirectSignature(true)
-        }
-
+        val infoGen = SignerInfoGenerator(origKP.signingKey, PKCS1SigSpec(Digest.SHA256), certList[0])
 
         val signedData = SignedDataBuilder().apply {
             addCertificates(certs)
