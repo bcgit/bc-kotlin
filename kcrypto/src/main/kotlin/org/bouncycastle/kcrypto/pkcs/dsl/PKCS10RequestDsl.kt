@@ -3,10 +3,9 @@ package org.bouncycastle.kcrypto.pkcs.dsl
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.X500Name
-import org.bouncycastle.kcrypto.VerificationKey
+import org.bouncycastle.kcrypto.PublicKey
 import org.bouncycastle.kcrypto.dsl.SignatureBlock
 import org.bouncycastle.kcrypto.pkcs.PKCS10Request
-import java.util.*
 
 
 /**
@@ -15,7 +14,7 @@ import java.util.*
 class PKCS10Body
 {
     lateinit var subject: X500Name
-    lateinit var subjectKey: Any
+    lateinit var subjectKey: PublicKey
 
     var attributes: AttributesBody? = null
 
@@ -23,7 +22,7 @@ class PKCS10Body
 
     fun build(): PKCS10Request {
 
-        var builder = signature.pkcs10RequestBuilder(subject, subjectKey as VerificationKey)
+        var builder = signature.pkcs10RequestBuilder(subject, subjectKey)
 
         var attrElements = attributes?.elements
         if (attrElements != null) {

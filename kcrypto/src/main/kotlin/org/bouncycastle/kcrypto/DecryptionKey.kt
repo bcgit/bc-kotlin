@@ -81,16 +81,16 @@ internal class BaseKeyUnwrapper(algorithm: AlgSpec<AlgorithmIdentifier>, private
     }
 }
 
-internal class BaseDecryptionKey(private var privKey: PrivateKey) : DecryptionKey {
+internal class BaseDecryptionKey(internal var _privKey: PrivateKey) : DecryptionKey {
 
-    override val encoding = privKey.encoded
+    override val encoding = _privKey.encoded
 
     override fun singleBlockDecryptor(algSpec: AlgSpec<AlgorithmIdentifier>): SingleBlockDecryptor<AlgorithmIdentifier> {
-        return BaseDecryptor(algSpec, privKey)
+        return BaseDecryptor(algSpec, _privKey)
     }
 
     override fun keyUnwrapper(algSpec: AlgSpec<AlgorithmIdentifier>): KeyUnwrapper<AlgorithmIdentifier> {
-        return BaseKeyUnwrapper(algSpec, privKey)
+        return BaseKeyUnwrapper(algSpec, _privKey)
     }
 }
 

@@ -1,8 +1,10 @@
 package org.bouncycastle.kcrypto.dsl
 
 import KCryptoServices
+import org.bouncycastle.kcrypto.EncryptingKeyPair
 import org.bouncycastle.kcrypto.SigningKeyPair
 import org.bouncycastle.kcrypto.param.DSADomainParameters
+import org.bouncycastle.kcrypto.spec.EncPairGenSpec
 import org.bouncycastle.kcrypto.spec.SignPairGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.DSAGenSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.ECGenSpec
@@ -84,6 +86,34 @@ fun SigningKeyBuilder.edDsa(block: EdDsaParams.() -> Unit) {
     val p = EdDsaParams().apply(block)
 
     setSpec(EdDSAGenSpec(p.curveName, KCryptoServices.secureRandom))
+}
+
+class EncryptingKeyBuilder {
+    private lateinit var spec: EncPairGenSpec
+
+    fun setSpec(genSpec: EncPairGenSpec) {
+        this.spec = genSpec
+    }
+
+    fun encryptingKeyPair(): EncryptingKeyPair {
+        return KCryptoServices.encryptingKeyPair(spec)
+    }
+}
+
+/**
+ * Create a signing key pair
+ * @param block initialisation
+ */
+fun encryptingKeyPair(block: EncryptingKeyBuilder.() -> Unit): EncryptingKeyPair = EncryptingKeyBuilder().apply(block).encryptingKeyPair()
+
+/**
+ * Initialize a RSA key pair.
+ * @param block initialization block
+ */
+fun EncryptingKeyBuilder.rsa(block: RsaParams.() -> Unit) {
+    val p = RsaParams().apply(block)
+
+    setSpec(RSAGenSpec(p.keySize, KCryptoServices.secureRandom))
 }
 
 /**

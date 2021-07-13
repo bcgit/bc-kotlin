@@ -7,6 +7,7 @@ import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.Extensions
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
+import org.bouncycastle.kcrypto.PublicKey
 import org.bouncycastle.kcrypto.VerificationKey
 import org.bouncycastle.kcrypto.cert.Certificate
 import org.bouncycastle.kcrypto.cert.ExtensionsBuilder
@@ -127,7 +128,7 @@ data class Ext(internal val isCritical: Boolean = false)
 
 data class ExtSubjectKeyId(var isCritical: Boolean = false)
 {
-    lateinit var subjectKey: VerificationKey
+    lateinit var subjectKey: PublicKey
 }
 
 data class ExtBasicConstraints(var isCritical: Boolean = false)

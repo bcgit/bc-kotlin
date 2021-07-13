@@ -6,7 +6,6 @@ import org.bouncycastle.kcrypto.*
 import org.bouncycastle.kcrypto.pkcs.PKCS10RequestBuilder
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.*
-import org.bouncycastle.util.Strings
 
 
 interface SigType
@@ -82,7 +81,7 @@ class SignatureBlock
         return signature.signingKey.signatureCalculator(signature.getSigAlgSpec())
     }
 
-    fun pkcs10RequestBuilder(subject: X500Name, verificationKey: VerificationKey): PKCS10RequestBuilder {
+    fun pkcs10RequestBuilder(subject: X500Name, verificationKey: PublicKey): PKCS10RequestBuilder {
         return PKCS10RequestBuilder(signature.signingKey, signature.getSigAlgSpec(), subject, verificationKey)
     }
 
@@ -123,6 +122,13 @@ class SignatureDetails(val parent: SignatureBlock, val sigType: SigType)
     infix fun using(signingKey: SigningKey): SignatureDetails {
         parent.signature = this;
         this.signingKey = signingKey
+
+        return this
+    }
+
+    infix fun using(decryptionKey: DecryptionKey): SignatureDetails {
+        parent.signature = this;
+        this.signingKey = BaseSigningKey((decryptionKey as BaseDecryptionKey)._privKey);
 
         return this
     }

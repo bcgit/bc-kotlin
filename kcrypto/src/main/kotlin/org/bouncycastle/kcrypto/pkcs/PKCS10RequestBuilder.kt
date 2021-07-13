@@ -16,7 +16,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder
  */
 class PKCS10RequestBuilder(private val signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, subjectName: X500Name, publicKeyInfo: SubjectPublicKeyInfo) {
 
-    constructor(signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, subjectName: X500Name, publicKey: VerificationKey): this(signatureCalculator, subjectName, SubjectPublicKeyInfo.getInstance(publicKey.encoding))
+    constructor(signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, subjectName: X500Name, publicKey: PublicKey): this(signatureCalculator, subjectName, SubjectPublicKeyInfo.getInstance(publicKey.encoding))
 
     /**
      * Create a PKCS#10 certification request builder based on this signing key for the passed in signature specification.
@@ -26,9 +26,11 @@ class PKCS10RequestBuilder(private val signatureCalculator: SignatureCalculator<
      * @param subjectName the subject name to include in the PKCS#10 request.
      * @param publicKey the subject public key to include in the PKCS#10 request.
      */
-    constructor(signingKey: SigningKey, sigAlgSpec: SigAlgSpec, subjectName: X500Name, publicKey: VerificationKey): this(signingKey.signatureCalculator(sigAlgSpec), subjectName, publicKey)
+    constructor(signingKey: SigningKey, sigAlgSpec: SigAlgSpec, subjectName: X500Name, publicKey: PublicKey): this(signingKey.signatureCalculator(sigAlgSpec), subjectName, publicKey)
 
     constructor(signingKeyPair: SigningKeyPair, sigAlgSpec: PKCS1SigSpec, name: X500Name) : this(signingKeyPair.signingKey, sigAlgSpec, name, signingKeyPair.verificationKey)
+
+    constructor(decryptionKey: EncryptionKey, sigAlgSpec: SigAlgSpec, subjectName: X500Name, publicKey: PublicKey): this(BaseSigningKey((decryptionKey as BaseDecryptionKey)._privKey).signatureCalculator(sigAlgSpec), subjectName, publicKey)
 
     constructor(encryptionKeyPair: EncryptingKeyPair, sigAlgSpec: PKCS1SigSpec, name: X500Name) : this(SigningKeyPair(encryptionKeyPair.kp).signingKey.signatureCalculator(sigAlgSpec), name, SubjectPublicKeyInfo.getInstance(encryptionKeyPair.encryptionKey.encoding))
     
