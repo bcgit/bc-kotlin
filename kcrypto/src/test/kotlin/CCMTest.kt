@@ -4,6 +4,7 @@ import org.bouncycastle.asn1.nist.NISTObjectIdentifiers
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.kcrypto.spec.symmetric.AESGenSpec
 import org.bouncycastle.kcrypto.spec.symmetric.CCMSpec
+import org.bouncycastle.kutil.isFIPS
 import org.bouncycastle.util.Arrays
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
@@ -34,8 +35,7 @@ public class CCMTest {
             //
             // One before start of nonce range.
             //
-            val ex = if (KCryptoServices._provider!!.name == "BC")
-                InvalidKeyException::class.java else InvalidAlgorithmParameterException::class.java
+            val ex = InvalidAlgorithmParameterException::class.java
 
             assertThrows(ex, {
                 val IV = ByteArray(6)
@@ -138,7 +138,7 @@ public class CCMTest {
         KCryptoServices.symmetricKey(AESGenSpec(128)).apply {
 
 
-            val encSpec = CCMSpec(IV, 16).validatedSpec(this)
+            val encSpec = CCMSpec(IV, 128).validatedSpec(this)
 
             val cipherTextStream = ByteArrayOutputStream().apply {
                 encryptor(encSpec).outputEncryptor(this).apply {
@@ -163,7 +163,6 @@ public class CCMTest {
 
                 }
             }
-
 
             assertTrue(Arrays.areEqual(message, plainTextStream.toByteArray()))
         }
@@ -289,7 +288,7 @@ public class CCMTest {
 
                 var cipherTextStream = ByteArrayOutputStream()
                 cipherTextStream.use {
-                    encryptor(CCMSpec(IV, 16)).outputEncryptor(it).apply {
+                    encryptor(CCMSpec(IV, 128)).outputEncryptor(it).apply {
                         aadStream.write(aad)
                         encStream.use {
                             it.write(message)
@@ -306,7 +305,7 @@ public class CCMTest {
 
                 try {
                     ByteArrayOutputStream().apply {
-                        decryptor(CCMSpec(IV, 16)).outputDecryptor(this).apply {
+                        decryptor(CCMSpec(IV, 128)).outputDecryptor(this).apply {
                             aadStream.write(aad)
                             decStream.use {
                                 it.write(ct)
@@ -352,7 +351,7 @@ public class CCMTest {
 
                 var cipherTextStream = ByteArrayOutputStream()
                 cipherTextStream.use {
-                    encryptor(CCMSpec(IV, 16)).outputEncryptor(it).apply {
+                    encryptor(CCMSpec(IV, 128)).outputEncryptor(it).apply {
                         aadStream.write(aad)
                         encStream.use {
                             it.write(message)
@@ -369,7 +368,7 @@ public class CCMTest {
                 ct[ct.size - 1] = ct[ct.size - 1] xor 1
                 try {
                     ByteArrayOutputStream().apply {
-                        decryptor(CCMSpec(IV, 16)).outputDecryptor(this).apply {
+                        decryptor(CCMSpec(IV, 128)).outputDecryptor(this).apply {
                             aadStream.write(aad)
                             decStream.use {
                                 it.write(ct)
@@ -415,7 +414,7 @@ public class CCMTest {
 
                 var cipherTextStream = ByteArrayOutputStream()
                 cipherTextStream.use {
-                    encryptor(CCMSpec(IV, 16)).outputEncryptor(it).apply {
+                    encryptor(CCMSpec(IV, 128)).outputEncryptor(it).apply {
                         aadStream.write(aad)
                         encStream.use {
                             it.write(message)
@@ -431,7 +430,7 @@ public class CCMTest {
                 brokenAAD[0] = brokenAAD[0] xor 1
                 try {
                     ByteArrayOutputStream().apply {
-                        decryptor(CCMSpec(IV, 16)).outputDecryptor(this).apply {
+                        decryptor(CCMSpec(IV, 128)).outputDecryptor(this).apply {
                             aadStream.write(brokenAAD)
                             decStream.use {
                                 it.write(cipherTextStream.toByteArray())

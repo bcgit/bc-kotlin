@@ -3,18 +3,15 @@ import org.bouncycastle.asn1.cms.CCMParameters
 import org.bouncycastle.asn1.cms.GCMParameters
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
-import org.bouncycastle.crypto.InvalidCipherTextException
 import org.bouncycastle.kcrypto.spec.symmetric.AESGenSpec
 import org.bouncycastle.kcrypto.spec.symmetric.CCMSpec
 import org.bouncycastle.kcrypto.spec.symmetric.GCMSpec
-
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.io.ByteArrayOutputStream
 import java.security.InvalidAlgorithmParameterException
-import java.security.Security
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SymAlgSpecTest {
@@ -396,24 +393,24 @@ class SymAlgSpecTest {
                     nonceLen = 13,
                     icvLen = 17,
                     oid = NISTObjectIdentifiers.id_aes128_CCM,
-                    ex = InvalidCipherTextException::class.java,
-                    exMsg = "Error during cipher finalisation"
+                    ex = InvalidAlgorithmParameterException::class.java,
+                    exMsg = "tag length in octets must be one of {4,6,8,10,12,14,16}"
                 ),
                 CCMVector(
                     keySize = 192,
                     nonceLen = 13,
                     icvLen = 17,
                     oid = NISTObjectIdentifiers.id_aes192_CCM,
-                    ex = InvalidCipherTextException::class.java,
-                    exMsg = "Error during cipher finalisation"
+                    ex = InvalidAlgorithmParameterException::class.java,
+                    exMsg = "tag length in octets must be one of {4,6,8,10,12,14,16}"
                 ),
                 CCMVector(
                     keySize = 256,
                     nonceLen = 13,
                     icvLen = 17,
                     oid = NISTObjectIdentifiers.id_aes256_CCM,
-                    ex = InvalidCipherTextException::class.java,
-                    exMsg = "Error during cipher finalisation"
+                    ex = InvalidAlgorithmParameterException::class.java,
+                    exMsg = "tag length in octets must be one of {4,6,8,10,12,14,16}"
                 )
             )
 

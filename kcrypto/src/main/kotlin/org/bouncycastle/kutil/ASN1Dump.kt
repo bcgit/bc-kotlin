@@ -191,12 +191,12 @@ class ASN1Dump(val oidMap: Map<ASN1ObjectIdentifier, String>, val translateOids:
 
             buf.append(nl)
 
-            if (obj.isEmpty) {
+            if (obj.getBaseObject() == null) {
                 buf.append(tab)
                 buf.append("EMPTY")
                 buf.append(nl)
             } else {
-                _dumpAsString(tab, verbose, obj.getObject(), buf)
+                _dumpAsString(tab, verbose, obj.getBaseObject().toASN1Primitive(), buf)
             }
         } else if (obj is ASN1Set) {
             val e = obj.objects

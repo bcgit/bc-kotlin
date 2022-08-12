@@ -58,7 +58,6 @@ class PKCS8Tests {
         val recoveredKey = pemPriv.privateKey(key, KeyType.DECRYPTION)
 
         assert(Arrays.areEqual(originalKey.encoding, recoveredKey.encoding))
-
     }
 
     @Test
