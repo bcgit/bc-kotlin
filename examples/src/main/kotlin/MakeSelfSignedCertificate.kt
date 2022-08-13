@@ -6,6 +6,7 @@ import org.bouncycastle.kcrypto.dsl.key
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kcrypto.spec.asymmetric.PKCS1SigSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
+import org.bouncycastle.kutil.findBCProvider
 
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter

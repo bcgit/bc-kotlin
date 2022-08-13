@@ -1,6 +1,8 @@
 package org.bouncycastle.kcrypto
 
 import KCryptoServices.Companion.helper
+import KCryptoServices.Companion.helperFor
+import KCryptoServices.Companion.pqcHelper
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.*
@@ -36,11 +38,14 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
             is SM2SigSpec -> {
                 simplify(sigSpec.digest.algorithmName + "withSM2")
             }
+            is FalconSigSpec -> {
+                simplify("Falcon")
+            }
             else ->
                 throw IllegalArgumentException("unknown SigAlgSpec")
         }
 
-        sig = helper.createSignature(algName)
+        sig = helperFor(algName).createSignature(algName)
 
         if (sigSpec is SM2SigSpec && sigSpec.id != null) {
             sig.setParameter(convert(sigSpec.id))

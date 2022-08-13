@@ -6,10 +6,7 @@ import org.bouncycastle.kcrypto.SigningKeyPair
 import org.bouncycastle.kcrypto.param.DSADomainParameters
 import org.bouncycastle.kcrypto.spec.EncPairGenSpec
 import org.bouncycastle.kcrypto.spec.SignPairGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.DSAGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.ECGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.EdDSAGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.*
 import java.math.BigInteger
 import java.security.Provider
 import java.security.Security
@@ -88,6 +85,16 @@ fun SigningKeyBuilder.edDsa(block: EdDsaParams.() -> Unit) {
     setSpec(EdDSAGenSpec(p.curveName, KCryptoServices.secureRandom))
 }
 
+/**
+ * Initialize an Falcon Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.falcon(block: FalconParams.() -> Unit) {
+    val p = FalconParams().apply(block)
+
+    setSpec(FalconGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+}
+
 class EncryptingKeyBuilder {
     private lateinit var spec: EncPairGenSpec
 
@@ -140,3 +147,8 @@ data class DsaParams(var domainParameters: DSADomainParameters = DSADomainParame
  * EdDSA Parameters
  */
 data class EdDsaParams(var curveName: String = "ED25519")
+
+/**
+ * Falcon Parameters
+ */
+data class FalconParams(var parameterSet: String = "falcon-512")

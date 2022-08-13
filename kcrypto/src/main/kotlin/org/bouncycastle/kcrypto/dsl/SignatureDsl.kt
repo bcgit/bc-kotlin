@@ -73,6 +73,16 @@ class SM2SigType: DigSigType
 }
 
 /**
+ * DSL for Falcon signature type.
+ */
+class FalconSigType: NoDigSigType
+{
+    override fun getSigAlgSpec(): SigAlgSpec {
+        return FalconSigSpec()
+    }
+}
+
+/**
  * DSL for block whose methods will return a calculator or a pkcs10RequestBuilder
  */
 class SignatureBlock
@@ -92,6 +102,7 @@ class SignatureBlock
     val DSA = SignatureDetails(this, DSASigType())
     val EdDSA = SignatureDetails(this, EdDSASigType())
     val SM2 = SignatureDetails(this, SM2SigType())
+    val Falcon = SignatureDetails(this, FalconSigType())
 
     val sha224 = Digest.SHA224
     val sha256 = Digest.SHA256

@@ -6,6 +6,7 @@ import org.bouncycastle.kcrypto.dsl.edDsa
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 import java.math.BigInteger

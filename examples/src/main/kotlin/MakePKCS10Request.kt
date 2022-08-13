@@ -6,6 +6,7 @@ import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.cert.dsl.*
 import org.bouncycastle.kcrypto.dsl.encryptingKeyPair
 import org.bouncycastle.kcrypto.dsl.rsa
+import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.attribute
 import org.bouncycastle.kcrypto.pkcs.dsl.attributes
@@ -15,9 +16,9 @@ import java.io.OutputStreamWriter
 
 fun main() {
 
-    using(findBCProvider())
+    using("BC")
 
-    var kp = encryptingKeyPair {
+    var kp = signingKeyPair {
         rsa {
             keySize = 2048
         }
@@ -41,13 +42,13 @@ fun main() {
             extValue = KeyUsage(KeyUsage.keyCertSign or KeyUsage.cRLSign)
         })
         subjectKeyIdentifierExtension {
-            subjectKey = kp.encryptionKey
+            subjectKey = kp.verificationKey
         }
     }
 
     var pkcs10 = pkcs10Request {
-        subject = name
-        subjectKey = kp.encryptionKey
+        subject = x500Name("CN=Test")
+        subjectKey = kp.verificationKey
         attributes = attributes {
              attribute {
                  attrType = PKCSObjectIdentifiers.pkcs_9_at_extensionRequest
@@ -55,13 +56,11 @@ fun main() {
              }
         }
         signature {
-            PKCS1v1dot5 with sha256 using kp.decryptionKey
+            PKCS1v1dot5 with sha256 using kp.signingKey
         }
     }
 
-    println(pkcs10.signatureVerifies())
-
-    OutputStreamWriter(System.out).writePEMObject(kp.decryptionKey)
+    OutputStreamWriter(System.out).writePEMObject(kp.signingKey)
 
     OutputStreamWriter(System.out).writePEMObject(pkcs10)
 }

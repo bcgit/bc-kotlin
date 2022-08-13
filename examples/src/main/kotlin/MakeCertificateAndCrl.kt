@@ -5,6 +5,7 @@ import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.param.DSADomainParameters
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 import java.math.BigInteger
@@ -87,11 +88,8 @@ fun main() {
     var encKey = encryptedPrivateKey {
         privateKey = kp.signingKey
         encryption {
-            AESKWP using SCRYPT {
+            AESKWP using PBKDF2 {
                 saltLength = 20
-                costParameter = 1048576
-                blockSize = 8
-                parallelization = 1
                 keySize = 256
             } with "Test".toCharArray()
         }

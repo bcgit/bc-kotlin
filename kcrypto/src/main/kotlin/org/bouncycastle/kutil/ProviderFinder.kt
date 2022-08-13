@@ -11,6 +11,12 @@ fun findBCProvider(): Provider {
     var provider = Security.getProvider("BC")
     if (provider == null) {
         provider = Security.getProvider("BCFIPS")
+    } else {
+        if (Security.getProvider("BCPQC") == null) {
+            val pqcCl = Class.forName("org.bouncycastle.jcajce.provider.BouncyCastlePQCProvider")
+            val pqcProvider = pqcCl.newInstance() as Provider
+            Security.addProvider(pqcProvider)
+        }
     }
 
     if (provider == null) {
@@ -18,6 +24,9 @@ fun findBCProvider(): Provider {
             val cl = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
             provider = cl.newInstance() as Provider
             Security.addProvider(provider)
+            val pqcCl = Class.forName("org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
+            val pqcProvider = pqcCl.newInstance() as Provider
+            Security.addProvider(pqcProvider)
         } catch (ex: ClassNotFoundException) {
             val cl = Class.forName("org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider")
             provider = cl.newInstance() as Provider

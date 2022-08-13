@@ -11,6 +11,7 @@ import org.bouncycastle.kcrypto.cert.dsl.subjectKeyIdentifierExtension
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kcrypto.spec.asymmetric.PKCS1SigSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 import java.math.BigInteger

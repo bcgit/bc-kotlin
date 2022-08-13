@@ -7,6 +7,7 @@ import org.bouncycastle.kcrypto.cms.dsl.certificateManagementMessage
 import org.bouncycastle.kcrypto.dsl.rsa
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 import java.math.BigInteger

@@ -11,6 +11,7 @@ import org.bouncycastle.kcrypto.dsl.verificationKey
 import org.bouncycastle.kcrypto.pkcs.dsl.attribute
 import org.bouncycastle.kcrypto.pkcs.dsl.attributes
 import org.bouncycastle.kcrypto.pkcs.dsl.pkcs10Request
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 

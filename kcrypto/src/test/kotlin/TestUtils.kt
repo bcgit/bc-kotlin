@@ -11,9 +11,12 @@ fun initProvider() {
 
     if (provider == null) {
         try {
-            val cl = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
-            provider = cl.newInstance() as Provider
+            val cl1 = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
+            provider = cl1.newInstance() as Provider
             Security.addProvider(provider)
+            val cl2 = Class.forName("org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
+            val pqcProvider = cl2.newInstance() as Provider
+            Security.addProvider(pqcProvider)
         } catch (ex: ClassNotFoundException) {
             val cl = Class.forName("org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider")
             provider = cl.newInstance() as Provider

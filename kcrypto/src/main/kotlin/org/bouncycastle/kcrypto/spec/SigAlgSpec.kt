@@ -15,6 +15,8 @@ import org.bouncycastle.kcrypto.spec.asymmetric.*
 // these are only in 1.0.2
 private val id_Ed25519 = ASN1ObjectIdentifier("1.3.101").branch("112").intern()
 private val id_Ed448 = ASN1ObjectIdentifier("1.3.101").branch("113").intern()
+private val falcon_512 = ASN1ObjectIdentifier("1.3.9999.3.1") // falcon.branch("1");
+private val falcon_1024 = ASN1ObjectIdentifier("1.3.9999.3.4") // falcon.branch("2");
 
 interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
     
@@ -41,6 +43,8 @@ interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
                 X9ObjectIdentifiers.ecdsa_with_SHA512 -> ECDSASigSpec(Digest.SHA512, algId)
                 id_Ed25519 -> EdDSASigSpec(algId)
                 id_Ed448 -> EdDSASigSpec(algId)
+                falcon_512 -> FalconSigSpec(algId)
+                falcon_1024 -> FalconSigSpec(algId)
                 // SM3withSM2
                 ASN1ObjectIdentifier("1.2.156.10197.1.501") -> SM2SigSpec(Digest.SM3, id, algId)
                 else -> throw IllegalArgumentException("unknown algorithm: " + algId.algorithm)

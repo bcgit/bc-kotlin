@@ -1,12 +1,13 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
-import org.bouncycastle.kcrypto.ID
 import org.bouncycastle.kcrypto.cert.dsl.certificate
 import org.bouncycastle.kcrypto.cert.dsl.rdn
 import org.bouncycastle.kcrypto.cert.dsl.x500Name
-import org.bouncycastle.kcrypto.dsl.ec
+import org.bouncycastle.kcrypto.dsl.edDsa
+import org.bouncycastle.kcrypto.dsl.falcon
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 import java.math.BigInteger
@@ -17,8 +18,8 @@ fun main() {
     using(findBCProvider())
 
     var kp = signingKeyPair {
-        ec {
-            curveName = "sm2p256v1"
+        falcon {
+            parameterSet = "Falcon-512"
         }
     }
 
@@ -40,11 +41,11 @@ fun main() {
         subjectPublicKey = kp.verificationKey
 
         signature {
-            SM2 with SM3 using kp.signingKey and ID("sm2test@bouncycastle.org")
+            Falcon using kp.signingKey
         }
     }
 
-    println("cert verifies " + cert.signatureVerifiedBy(cert, ID("sm2test@bouncycastle.org")))
+    println("cert verifies " + cert.signatureVerifiedBy(cert))
 
     var encKey = encryptedPrivateKey {
         privateKey = kp.signingKey

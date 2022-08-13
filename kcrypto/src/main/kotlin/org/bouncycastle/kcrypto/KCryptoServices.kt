@@ -1,3 +1,4 @@
+import org.bouncycastle.asn1.bc.BCObjectIdentifiers
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
@@ -8,15 +9,14 @@ import org.bouncycastle.kcrypto.*
 import org.bouncycastle.kcrypto.internal.PBKDF2PbKdf
 import org.bouncycastle.kcrypto.internal.ScryptPbKdf
 import org.bouncycastle.kcrypto.spec.*
-import org.bouncycastle.kcrypto.spec.asymmetric.DSAGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.ECGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.EdDSAGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.RSAGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.*
 import org.bouncycastle.kcrypto.spec.kdf.PBKDF2Spec
 import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.*
+import org.bouncycastle.pqc.jcajce.spec.FalconParameterSpec
 import java.security.Provider
 import java.security.SecureRandom
+import java.security.Security
 import java.security.spec.*
 import javax.crypto.spec.SecretKeySpec
 
@@ -48,6 +48,7 @@ class KCryptoServices {
 
     companion object {
         private var _helper: JcaJceHelper = DefaultJcaJceHelper()
+        private var _pqcHelper: JcaJceHelper = if (Security.getProvider("BCPQC") != null) ProviderJcaJceHelper(Security.getProvider("BCPQC")) else _helper
 
         private var _secureRandom: SecureRandom = SecureRandom()
 
@@ -59,7 +60,20 @@ class KCryptoServices {
             _secureRandom = helper.createSecureRandom("DEFAULT")
         }
 
+        internal fun isPQC(name: String): Boolean
+        {
+             return name.equals("FALCON", true) || name.startsWith("1.3.9999.3")
+                     || name.equals("SPHINCSPlus", true) || name.equals("SPHINCS+", true) || name.startsWith(BCObjectIdentifiers.sphincsPlus.id)
+        }
+
+        internal fun helperFor(algorithm: String): JcaJceHelper
+        {
+            return if (isPQC(algorithm)) _pqcHelper else _helper
+        }
+
         internal val helper: JcaJceHelper get() = _helper
+
+        internal val pqcHelper: JcaJceHelper get() = _pqcHelper
 
         val secureRandom: SecureRandom get() = _secureRandom
 
@@ -92,6 +106,12 @@ class KCryptoServices {
                     dsaGen.initialize(dsaSpec, keyGenSpec.random)
                     return SigningKeyPair(KeyPair(dsaGen.genKeyPair()))
                 }
+                is FalconGenSpec -> {
+                    val falconGen = _pqcHelper.createKeyPairGenerator("Falcon")
+                    val falconSpec = FalconParameterSpec.fromName(keyGenSpec.parameterSet)
+                    falconGen.initialize(falconSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(falconGen.genKeyPair()))
+                }
                 else ->
                     throw IllegalArgumentException("unknown KeyGenSpec")
             }
@@ -122,7 +142,7 @@ class KCryptoServices {
         fun verificationKey(encodedKey: ByteArray, keyType: KeyType<VerificationKey>): VerificationKey {
             var algorithm = if (keyType.algorithm.equals("Verification"))
                                 SubjectPublicKeyInfo.getInstance(encodedKey).algorithm.algorithm.id else keyType.algorithm
-            var kf = helper.createKeyFactory(algorithm)
+            var kf = helperFor(algorithm).createKeyFactory(algorithm)
 
             return BaseVerificationKey(kf.generatePublic(X509EncodedKeySpec(encodedKey)))
         }
@@ -137,7 +157,7 @@ class KCryptoServices {
         fun encryptionKey(encodedKey: ByteArray, keyType: KeyType<EncryptionKey>): EncryptionKey {
             var algorithm = if (keyType.algorithm.equals("Encryption"))
                                 SubjectPublicKeyInfo.getInstance(encodedKey).algorithm.algorithm.id else keyType.algorithm
-            var kf = helper.createKeyFactory(algorithm)
+            var kf = helperFor(algorithm).createKeyFactory(algorithm)
 
             return BaseEncryptionKey(kf.generatePublic(X509EncodedKeySpec(encodedKey)))
         }
@@ -152,7 +172,7 @@ class KCryptoServices {
         fun signingKey(encodedKey: ByteArray, keyType: KeyType<SigningKey>): SigningKey {
             var algorithm = if (keyType.algorithm.equals("Signing"))
                 PrivateKeyInfo.getInstance(encodedKey).privateKeyAlgorithm.algorithm.id else keyType.algorithm
-            var kf = helper.createKeyFactory(algorithm)
+            var kf = helperFor(algorithm).createKeyFactory(algorithm)
 
             return BaseSigningKey(kf.generatePrivate(PKCS8EncodedKeySpec(encodedKey)))
         }
@@ -167,7 +187,7 @@ class KCryptoServices {
         fun decryptionKey(encodedKey: ByteArray, keyType: KeyType<DecryptionKey>): DecryptionKey {
             var algorithm = if (keyType.algorithm.equals("Decryption"))
                             PrivateKeyInfo.getInstance(encodedKey).privateKeyAlgorithm.algorithm.id else keyType.algorithm
-            var kf = helper.createKeyFactory(algorithm)
+            var kf = helperFor(algorithm).createKeyFactory(algorithm)
 
             return BaseDecryptionKey(kf.generatePrivate(PKCS8EncodedKeySpec(encodedKey)))
         }

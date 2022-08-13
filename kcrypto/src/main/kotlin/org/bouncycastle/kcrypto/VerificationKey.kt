@@ -2,6 +2,7 @@ package org.bouncycastle.kcrypto
 
 import KCryptoServices
 import KCryptoServices.Companion.helper
+import KCryptoServices.Companion.pqcHelper
 import org.bouncycastle.asn1.DERNull
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams
@@ -54,7 +55,9 @@ private class Verifier(algorithm: String, algorithmIdentifier: AlgorithmIdentifi
     val sig: Signature
 
     init {
-        sig = helper.createSignature(algorithm)
+        val isPQC = algorithm.equals("FALCON") || algorithm.equals("SPHINCS+");
+
+        sig = if (isPQC) pqcHelper.createSignature(algorithm) else helper.createSignature(algorithm)
 
         var params = algorithmIdentifier.parameters
         if (params != null && !params.equals(DERNull.INSTANCE)) {

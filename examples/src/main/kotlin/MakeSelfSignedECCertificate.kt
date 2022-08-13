@@ -1,11 +1,13 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.kcrypto.cert.dsl.certificate
+import org.bouncycastle.kcrypto.cert.dsl.extensions
 import org.bouncycastle.kcrypto.cert.dsl.rdn
 import org.bouncycastle.kcrypto.cert.dsl.x500Name
 import org.bouncycastle.kcrypto.dsl.ec
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
+import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 import java.math.BigInteger
@@ -37,7 +39,7 @@ fun main() {
         notAfter = expDate
         subject = name
         subjectPublicKey = kp.verificationKey
-
+        extensions = extensions {  }
         signature {
             ECDSA with sha256 using kp.signingKey
         }
@@ -48,11 +50,12 @@ fun main() {
     var encKey = encryptedPrivateKey {
         privateKey = kp.signingKey
         encryption {
-            AESKWP using SCRYPT {
+            AESKWP using PBKDF2 {
                 saltLength = 20
-                costParameter = 1048576
-                blockSize = 8
-                parallelization = 1
+                iterationCount = 8192
+//                costParameter = 1048576
+//                blockSize = 8
+//                parallelization = 1
                 keySize = 256
             } with "Test".toCharArray()
         }
