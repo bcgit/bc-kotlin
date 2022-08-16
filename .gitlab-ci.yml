@@ -6,5 +6,5 @@ build:
   script:
     - "apply_overlay bc-java ./"
     - "bash installbetas.sh \"jdk18on-172b12\" \"./bc-jars-reg\""
-    - ". cienv.sh; \ gradle clean build"
+    - ". cienv.sh; \ gradle clean build test"
   
