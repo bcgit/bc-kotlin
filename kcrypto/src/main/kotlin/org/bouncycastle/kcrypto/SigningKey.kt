@@ -41,6 +41,12 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
             is FalconSigSpec -> {
                 simplify("Falcon")
             }
+            is DilithiumSigSpec -> {
+                simplify("Dilithium")
+            }
+            is SPHINCSPlusSigSpec -> {
+                simplify("SPHINCSPlus")
+            }
             else ->
                 throw IllegalArgumentException("unknown SigAlgSpec")
         }

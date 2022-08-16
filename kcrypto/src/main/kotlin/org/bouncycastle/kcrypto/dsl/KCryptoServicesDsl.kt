@@ -95,6 +95,26 @@ fun SigningKeyBuilder.falcon(block: FalconParams.() -> Unit) {
     setSpec(FalconGenSpec(p.parameterSet, KCryptoServices.secureRandom))
 }
 
+/**
+ * Initialize an Falcon Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.dilithium(block: DilithiumParams.() -> Unit) {
+    val p = DilithiumParams().apply(block)
+
+    setSpec(DilithiumGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+}
+
+/**
+ * Initialize an Falcon Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.sphincsPlus(block: SPHINCSPlusParams.() -> Unit) {
+    val p = SPHINCSPlusParams().apply(block)
+
+    setSpec(SPHINCSPlusGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+}
+
 class EncryptingKeyBuilder {
     private lateinit var spec: EncPairGenSpec
 
@@ -152,3 +172,13 @@ data class EdDsaParams(var curveName: String = "ED25519")
  * Falcon Parameters
  */
 data class FalconParams(var parameterSet: String = "falcon-512")
+
+/**
+ * Dilithium Parameters
+ */
+data class DilithiumParams(var parameterSet: String = "dilithium5")
+
+/**
+ * SphincsPlus Parameters
+ */
+data class SPHINCSPlusParams(var parameterSet: String = "shake_128f")

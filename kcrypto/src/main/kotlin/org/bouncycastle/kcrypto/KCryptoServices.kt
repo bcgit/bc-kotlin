@@ -13,7 +13,9 @@ import org.bouncycastle.kcrypto.spec.asymmetric.*
 import org.bouncycastle.kcrypto.spec.kdf.PBKDF2Spec
 import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.*
+import org.bouncycastle.pqc.jcajce.spec.DilithiumParameterSpec
 import org.bouncycastle.pqc.jcajce.spec.FalconParameterSpec
+import org.bouncycastle.pqc.jcajce.spec.SPHINCSPlusParameterSpec
 import java.security.Provider
 import java.security.SecureRandom
 import java.security.Security
@@ -63,7 +65,8 @@ class KCryptoServices {
         internal fun isPQC(name: String): Boolean
         {
              return name.equals("FALCON", true) || name.startsWith("1.3.9999.3")
-                     || name.equals("SPHINCSPlus", true) || name.equals("SPHINCS+", true) || name.startsWith(BCObjectIdentifiers.sphincsPlus.id)
+                     || name.equals("SPHINCSPLUS", true) || name.equals("SPHINCS+", true) || name.startsWith(BCObjectIdentifiers.sphincsPlus.id)
+                     || name.equals("DILITHIUM", true) || name.startsWith("1.3.6.1.4.1.2.267.7")
         }
 
         internal fun helperFor(algorithm: String): JcaJceHelper
@@ -111,6 +114,18 @@ class KCryptoServices {
                     val falconSpec = FalconParameterSpec.fromName(keyGenSpec.parameterSet)
                     falconGen.initialize(falconSpec, keyGenSpec.random)
                     return SigningKeyPair(KeyPair(falconGen.genKeyPair()))
+                }
+                is DilithiumGenSpec -> {
+                    val dilithiumGen = _pqcHelper.createKeyPairGenerator("Dilithium")
+                    val dilithiumSpec = DilithiumParameterSpec.fromName(keyGenSpec.parameterSet)
+                    dilithiumGen.initialize(dilithiumSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(dilithiumGen.genKeyPair()))
+                }
+                is SPHINCSPlusGenSpec -> {
+                    val sphincsPlusGen = _pqcHelper.createKeyPairGenerator("SPHINCSPlus")
+                    val sphincsPlusSpec = SPHINCSPlusParameterSpec.fromName(keyGenSpec.parameterSet)
+                    sphincsPlusGen.initialize(sphincsPlusSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(sphincsPlusGen.genKeyPair()))
                 }
                 else ->
                     throw IllegalArgumentException("unknown KeyGenSpec")
