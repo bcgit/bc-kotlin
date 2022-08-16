@@ -1,0 +1,10 @@
+stages:
+  - test
+
+build:
+  stage: test
+  script:
+    - "apply_overlay bc-java ./"
+    - "sh fetchbeta.sh \"jdk18on-172b12\" \"./bc-jars-reg\""
+    - ". cienv.sh; \ gradle clean build"
+  
