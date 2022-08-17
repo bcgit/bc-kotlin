@@ -11,9 +11,7 @@ import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.pqc.jcajce.interfaces.SPHINCSPlusKey
 
 // these are only in 1.0.2
-private val falcon_512 = ASN1ObjectIdentifier("1.3.9999.3.1") // falcon.branch("1");
-private val falcon_1024 = ASN1ObjectIdentifier("1.3.9999.3.4") // falcon.branch("2");
-
+val sphincsPlus = BCObjectIdentifiers.sphincsPlus
 
 class SPHINCSPlusSigSpec: SigAlgSpec {
 

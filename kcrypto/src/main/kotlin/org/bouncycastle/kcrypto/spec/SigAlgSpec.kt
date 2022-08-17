@@ -1,6 +1,7 @@
 package org.bouncycastle.kcrypto.spec
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.bc.BCObjectIdentifiers
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
@@ -45,6 +46,10 @@ interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
                 id_Ed448 -> EdDSASigSpec(algId)
                 falcon_512 -> FalconSigSpec(algId)
                 falcon_1024 -> FalconSigSpec(algId)
+                dilithium2 -> DilithiumSigSpec(algId)
+                dilithium3 -> DilithiumSigSpec(algId)
+                dilithium5 -> DilithiumSigSpec(algId)
+                sphincsPlus -> SPHINCSPlusSigSpec(algId)
                 // SM3withSM2
                 ASN1ObjectIdentifier("1.2.156.10197.1.501") -> SM2SigSpec(Digest.SM3, id, algId)
                 else -> throw IllegalArgumentException("unknown algorithm: " + algId.algorithm)
