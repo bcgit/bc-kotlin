@@ -3,6 +3,8 @@ package org.bouncycastle.kcrypto.cert.dsl
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x509.BasicConstraints
+import org.bouncycastle.asn1.x509.GeneralName
+import org.bouncycastle.asn1.x509.GeneralNames
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.Extensions
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
@@ -120,6 +122,18 @@ fun ExtensionsBody.authorityKeyIdentifierExtension(block: ExtAuthorityKeyId.() -
     return e
 }
 
+fun ExtensionsBody.emailAltNameExtension(block: ExtAltName.() -> Unit): Ext
+{
+    var es = ExtAltName().apply(block)
+
+    var e = Ext(false)
+    e.extOid = Extension.subjectAlternativeName
+    e.extValue = GeneralNames(GeneralName(1, es.email))
+    addExtension(e)
+
+    return e
+}
+
 data class Ext(internal val isCritical: Boolean = false)
 {
     lateinit var extOid: ASN1ObjectIdentifier
@@ -141,3 +155,9 @@ data class ExtAuthorityKeyId(var isCritical: Boolean = false)
 {
     lateinit var authorityKey: Any
 }
+
+data class ExtAltName(var isCritical: Boolean = false)
+{
+    lateinit var email: String
+}
+
