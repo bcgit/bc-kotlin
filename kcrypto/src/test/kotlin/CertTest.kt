@@ -1,13 +1,12 @@
 import org.bouncycastle.asn1.ASN1GeneralizedTime
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.DERPrintableString
+import org.bouncycastle.asn1.DERSequence
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
 import org.bouncycastle.asn1.util.ASN1Dump
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.style.BCStyle
-import org.bouncycastle.asn1.x509.BasicConstraints
-import org.bouncycastle.asn1.x509.Extension
-import org.bouncycastle.asn1.x509.KeyUsage
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
+import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.kcrypto.Digest
 import org.bouncycastle.kcrypto.SigningKeyPair
 import org.bouncycastle.kcrypto.cert.CRL
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.io.FileOutputStream
 import java.math.BigInteger
 import java.util.*
 import kotlin.experimental.xor
@@ -413,6 +413,61 @@ class CertTest {
             subjectPublicKey = caKP.verificationKey
             extensions = exts
             
+            signature {
+                ECDSA with sha256 using caKP.signingKey
+            }
+        }
+
+        val certRes = Certificate(selfSigned.encoding)
+        assertTrue(name.equals(certRes.issuer))
+        assertTrue(name.equals(certRes.subject))
+    }
+
+    @Test
+    fun `selfsigned cert with SubjectAlt and IssuerAlt`() {
+
+        val expDate = Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000)
+
+        var name = x500Name {
+            rdn(BCStyle.C, "AU")
+            rdn(BCStyle.O, "The Legion of the Bouncy Castle")
+            rdn(BCStyle.L, "Melbourne")
+            rdn(BCStyle.CN, "Eric H. Echidna")
+            rdn(BCStyle.EmailAddress, "feedback-crypto@bouncycastle.org")
+        }
+
+        var exts = extensions {
+            extension {
+                extOid = Extension.basicConstraints
+                extValue = BasicConstraints(false)
+            }
+            subjectAltNameExtension {
+                rfc822Name("test1@test")
+                email("test1@test")
+                dNSName("bouncycastle.org")
+                iPAddress("10.9.7.6")
+                registeredID("1.2.3") // OID
+                directoryName("CN=Test")
+            }
+            issuerAltNameExtension {
+                rfc822Name("test1@test")
+                email("test1@test")
+                uniformResourceIdentifier("https://www.bouncycastle.org/1")
+                uri("https://www.bouncycastle.org/2")
+                url("https://www.bouncycastle.org/3")
+                directoryName(name)
+                generalName(GeneralName.otherName, DERSequence(DERPrintableString("Other")))
+            }
+        }
+
+        var selfSigned = certificate {
+            serialNumber = BigInteger.valueOf(1)
+            issuer = name
+            notAfter = expDate
+            subject = name
+            subjectPublicKey = caKP.verificationKey
+            extensions = exts
+
             signature {
                 ECDSA with sha256 using caKP.signingKey
             }

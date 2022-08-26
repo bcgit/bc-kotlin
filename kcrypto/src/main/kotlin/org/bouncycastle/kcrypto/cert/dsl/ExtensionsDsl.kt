@@ -2,10 +2,9 @@ package org.bouncycastle.kcrypto.cert.dsl
 
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
-import org.bouncycastle.asn1.x509.BasicConstraints
-import org.bouncycastle.asn1.x509.Extension
-import org.bouncycastle.asn1.x509.Extensions
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
+import org.bouncycastle.asn1.x500.X500Name
+import org.bouncycastle.asn1.x500.X500NameBuilder
+import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.kcrypto.PublicKey
 import org.bouncycastle.kcrypto.VerificationKey
@@ -124,6 +123,26 @@ fun ExtensionsBody.authorityKeyIdentifierExtension(block: ExtAuthorityKeyId.() -
     return e
 }
 
+fun ExtensionsBody.subjectAltNameExtension(block: GeneralNamesBuilder.() -> Unit): Ext
+{
+    var e = Ext(false)
+    e.extOid = Extension.subjectAlternativeName
+    e.extValue = GeneralNamesBuilder().apply(block).build()
+    addExtension(e)
+
+    return e
+}
+
+fun ExtensionsBody.issuerAltNameExtension(block: GeneralNamesBuilder.() -> Unit): Ext
+{
+    var e = Ext(false)
+    e.extOid = Extension.issuerAlternativeName
+    e.extValue = GeneralNamesBuilder().apply(block).build()
+    addExtension(e)
+
+    return e
+}
+
 data class Ext(internal val isCritical: Boolean = false)
 {
     lateinit var extOid: ASN1ObjectIdentifier
@@ -145,3 +164,48 @@ data class ExtAuthorityKeyId(var isCritical: Boolean = false)
 {
     lateinit var authorityKey: Any
 }
+
+fun GeneralNamesBuilder.email(value: String) {
+    addName(GeneralName(GeneralName.rfc822Name, value))
+}
+
+fun GeneralNamesBuilder.rfc822Name(value: String) {
+    addName(GeneralName(GeneralName.rfc822Name, value))
+}
+
+fun GeneralNamesBuilder.iPAddress(value: String) {
+    addName(GeneralName(GeneralName.iPAddress, value))
+}
+
+fun GeneralNamesBuilder.directoryName(value: String) {
+    addName(GeneralName(GeneralName.directoryName, value))
+}
+
+fun GeneralNamesBuilder.directoryName(value: X500Name) {
+    addName(GeneralName(value))
+}
+
+fun GeneralNamesBuilder.dNSName(value: String) {
+    addName(GeneralName(GeneralName.dNSName, value))
+}
+
+fun GeneralNamesBuilder.uniformResourceIdentifier(value: String) {
+    addName(GeneralName(GeneralName.uniformResourceIdentifier, value))
+}
+
+fun GeneralNamesBuilder.uri(value: String) {
+    addName(GeneralName(GeneralName.uniformResourceIdentifier, value))
+}
+
+fun GeneralNamesBuilder.url(value: String) {
+    addName(GeneralName(GeneralName.uniformResourceIdentifier, value))
+}
+
+fun GeneralNamesBuilder.registeredID(value: String) {
+    addName(GeneralName(GeneralName.registeredID, value))
+}
+
+fun GeneralNamesBuilder.generalName(id: Int, value: ASN1Encodable) {
+    addName(GeneralName(id, value))
+}
+
