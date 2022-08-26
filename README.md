@@ -11,9 +11,47 @@ The **kcrypto** module provides the core functionality for the library.
 
 The **examples** module provides examples of DSL use for various features, such as X.509 certificate and CRL generation, as well PKCS#10 certification requests.
 
+The **scripts** directory contains easily modifiable kotlin scripts to generate keys and certificate chains.
+
 ## Building
 
 The gradle script has been tested with gradle-4.9 and later.
+
+To build put desired versions of BC jars in the directory bc-jars-reg and build with:
+
+> gradle build
+
+BC version 1.72b13 or later is required to build due to PQC support for Falcon and Dilithium.
+
+## Running
+
+Kotlin libraries are added to lib, and you can easily run the examples and scripts. Modify them and have fun.
+
+### Scripts
+Examples of running kotlin script examples:
+
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-fips/bc-fips-1.0.2.3.jar:bc-jars-fips/bcpkix-fips-1.0.6.jar -script scripts/MakeFullPath.kts`
+
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar -script scripts/Falcon.kts`
+
+You can also run kotlin interactively like:
+```
+kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar
+>>> :load scripts/Falcon.kts
+```
+
+# Code
+How to run code examples:
+
+Build to code (into .class files)
+```
+cd examples
+gradle build
+cd ..
+```
+Run 'main' methods in the examples:
+
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar:examples/build/classes/kotlin/main MakeV3SelfSignedCertificateKt'
 
 ## Feedback and Contributions
 
