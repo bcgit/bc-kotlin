@@ -5,6 +5,6 @@ build:
   stage: test
   script:
     - "apply_overlay bc-java ./"
-    - "var=\"$(curl https://downloads.bouncycastle.org/betas/beta.ver)\";bash installbetas.sh \"$ver\" \"./bc-jars-reg\""
+    - "bash installbetas.sh \"$(curl https://downloads.bouncycastle.org/betas/beta.ver)\" \"./bc-jars-reg\""
     - ". cienv.sh; \ gradle clean build test"
   
