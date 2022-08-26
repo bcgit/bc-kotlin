@@ -476,7 +476,6 @@ class CertTest {
         val certRes = Certificate(selfSigned.encoding)
         assertTrue(name.equals(certRes.issuer))
         assertTrue(name.equals(certRes.subject))
-        FileOutputStream("/tmp/fred.crt").write(selfSigned._cert.encoded)
     }
 
     @Test
