@@ -110,6 +110,10 @@ fun ExtensionsBody.authorityKeyIdentifierExtension(block: ExtAuthorityKeyId.() -
     {
         e.extValue = extUtils.createAuthorityKeyIdentifier(SubjectPublicKeyInfo.getInstance((ea.authorityKey as VerificationKey).encoding))
     }
+    else if (ea.authorityKey is SubjectPublicKeyInfo)
+    {
+        e.extValue = extUtils.createAuthorityKeyIdentifier(ea.authorityKey as SubjectPublicKeyInfo)
+    }
     else
     {
         throw IllegalArgumentException("unknown authorityKey type")
