@@ -2,6 +2,9 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.KeyUsage
+import org.bouncycastle.asn1.x509.GeneralName
+import org.bouncycastle.asn1.DERSequence
+import org.bouncycastle.asn1.DERPrintableString
 import org.bouncycastle.kcrypto.cert.dsl.*
 import org.bouncycastle.kcrypto.cms.dsl.certificateManagementMessage
 import org.bouncycastle.kcrypto.dsl.rsa
@@ -65,6 +68,15 @@ var caExtensions = extensions {
         extOid = Extension.keyUsage
         extValue = KeyUsage(KeyUsage.cRLSign or KeyUsage.keyCertSign)
     })
+    issuerAltNameExtension {
+        rfc822Name("feedback-crypto@bouncycastle.org")
+        email("feedback-crypto@bouncycastle.org")
+        uniformResourceIdentifier("https://www.bouncycastle.org/1")
+        uri("https://www.bouncycastle.org/2")
+        url("https://www.bouncycastle.org/3")
+        directoryName("CN=Eric's CA,L=Melbourne,O=The Legion of the Bouncy Castle,C=AU")
+        generalName(GeneralName.otherName, DERSequence(DERPrintableString("Other")))
+    }    
     critical(subjectKeyIdentifierExtension {
         subjectKey = caKp.verificationKey
     })
@@ -114,6 +126,14 @@ var eeCert = certificate {
         critical(basicConstraintsExtension {
             isCA = false
         })
+        subjectAltNameExtension {
+            rfc822Name("feedback-crypto@bouncycastle.org")
+            email("feedback-crypto@bouncycastle.org")
+            dNSName("bouncycastle.org")
+            iPAddress("10.9.7.6")
+            registeredID("1.2.3") // OID
+            directoryName("CN=Eric H. Echidna,L=Melbourne,O=The Legion of the Bouncy Castle,C=AU")
+        }
         subjectKeyIdentifierExtension {
             subjectKey = eeKp.verificationKey
         }
