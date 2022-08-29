@@ -25,14 +25,20 @@ BC version 1.72b13 or later is required to build due to PQC support for Falcon a
 
 ## Running
 
-Kotlin libraries are added to lib, and you can easily run the examples and scripts. Modify them and have fun.
+Kotlin needs to be installed. 
+
+On Ubuntu:
+
+`sudo snap install kotlin --classic`
+
+After that, needed kotlin libraries are added to the lib folder for you, and you can easily run the examples and scripts. Modify them and have fun.
 
 ### Scripts
 Examples of running kotlin script examples:
 
-`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-fips/bc-fips-1.0.2.3.jar:bc-jars-fips/bcpkix-fips-1.0.6.jar -script scripts/MakeFullPath.kts`
+`kotlinc -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-fips/bc-fips-1.0.2.3.jar:bc-jars-fips/bcpkix-fips-1.0.6.jar -script scripts/MakeFullPath.kts`
 
-`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar -script scripts/Falcon.kts`
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar scripts/Falcon.kts`
 
 You can also run kotlin interactively like:
 ```
