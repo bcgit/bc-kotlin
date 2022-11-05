@@ -106,13 +106,23 @@ fun SigningKeyBuilder.dilithium(block: DilithiumParams.() -> Unit) {
 }
 
 /**
- * Initialize an Falcon Key pair
+ * Initialize an sphincs+ Key pair
  * @param block initialization block.
  */
 fun SigningKeyBuilder.sphincsPlus(block: SPHINCSPlusParams.() -> Unit) {
     val p = SPHINCSPlusParams().apply(block)
 
     setSpec(SPHINCSPlusGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+}
+
+/**
+ * Initialize an sphincs+ Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.lms(block: LMSParams.() -> Unit) {
+    val p = LMSParams().apply(block)
+
+    setSpec(LMSGenSpec(p.sigParameterSet, p.otsParameterSet, KCryptoServices.secureRandom))
 }
 
 class EncryptingKeyBuilder {
@@ -182,3 +192,8 @@ data class DilithiumParams(var parameterSet: String = "dilithium5")
  * SphincsPlus Parameters
  */
 data class SPHINCSPlusParams(var parameterSet: String = "shake_128f")
+
+/**
+ * LMS Parameters
+ */
+data class LMSParams(var sigParameterSet: String = "lms-sha256-n32-h10", var otsParameterSet: String = "sha256-n32-w2")

@@ -15,6 +15,8 @@ import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.*
 import org.bouncycastle.pqc.jcajce.spec.DilithiumParameterSpec
 import org.bouncycastle.pqc.jcajce.spec.FalconParameterSpec
+import org.bouncycastle.pqc.jcajce.spec.LMSHSSKeyGenParameterSpec
+import org.bouncycastle.pqc.jcajce.spec.LMSKeyGenParameterSpec
 import org.bouncycastle.pqc.jcajce.spec.SPHINCSPlusParameterSpec
 import java.security.Provider
 import java.security.SecureRandom
@@ -127,10 +129,17 @@ class KCryptoServices {
                     sphincsPlusGen.initialize(sphincsPlusSpec, keyGenSpec.random)
                     return SigningKeyPair(KeyPair(sphincsPlusGen.genKeyPair()))
                 }
+                is LMSGenSpec -> {
+                    val lmsGen = _pqcHelper.createKeyPairGenerator("LMS")
+                    val lmsSpec = LMSKeyGenParameterSpec.fromNames(keyGenSpec.sigParameterSet, keyGenSpec.otsParameterSet)
+                    lmsGen.initialize(lmsSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(lmsGen.genKeyPair()))
+                }
                 else ->
                     throw IllegalArgumentException("unknown KeyGenSpec")
             }
         }
+
 
         /**
          * Generate a new key pair for encryption and decryption.

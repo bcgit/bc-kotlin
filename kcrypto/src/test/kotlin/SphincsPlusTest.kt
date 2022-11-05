@@ -71,7 +71,7 @@ class SphincsPlusTest {
 
         try {
             val sigVer2 = KCryptoServices
-                    .verificationKey(pubKey.encoded, FalconGenSpec.verifyType)
+                    .verificationKey(pubKey.encoded, SPHINCSPlusGenSpec.verifyType)
                     .signatureVerifier(FalconSigSpec())
 
             sigVer2.use {

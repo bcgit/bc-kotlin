@@ -4,8 +4,10 @@ import KCryptoServices.Companion.helper
 import KCryptoServices.Companion.helperFor
 import KCryptoServices.Companion.pqcHelper
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
+import org.bouncycastle.kcrypto.dsl.signingKey
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.*
+import org.bouncycastle.pqc.jcajce.interfaces.LMSPrivateKey
 import org.bouncycastle.util.Strings
 import java.io.OutputStream
 import java.security.PrivateKey
@@ -79,11 +81,64 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
     }
 }
 
+internal class IndexedBaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : IndexedSignatureCalculator<AlgorithmIdentifier> {
+
+    override val stream: OutputStream
+    override val algorithmIdentifier: AlgorithmIdentifier
+
+    val sig: Signature
+    val sigKey: BaseSigningKey
+
+    init {
+        val algName: String = when (sigSpec) {
+            is LMSSigSpec -> {
+                simplify("LMS")
+            }
+            else ->
+                throw IllegalArgumentException("unknown SigAlgSpec")
+        }
+
+        sigKey = signingKey
+        sig = helperFor(algName).createSignature(algName)
+
+        if (sigSpec is SM2SigSpec && sigSpec.id != null) {
+            sig.setParameter(convert(sigSpec.id))
+            sig.initSign(signingKey._privKey)
+        }  else {
+            sig.initSign(signingKey._privKey)
+        }
+
+        stream = SigningStream(sig)
+
+        algorithmIdentifier = sigSpec.algorithmIdentifier
+    }
+
+    private fun simplify(algorithmName: String): String
+    {
+        return algorithmName.replace("-", "")
+    }
+
+    override fun signature(): ByteArray {
+        return (stream as SigningStream).signature
+    }
+
+    override fun close() {
+        stream.close()
+    }
+
+    override fun index(): Long {
+        return (sigKey._privKey as LMSPrivateKey).index
+    }
+}
+
 internal class BaseSigningKey(internal val _privKey: PrivateKey) : SigningKey {
 
     override val encoding get() = _privKey.encoded
 
     override fun signatureCalculator(sigAlgSpec: SigAlgSpec): SignatureCalculator<AlgorithmIdentifier> {
+        if (_privKey is LMSPrivateKey) {
+            return IndexedBaseSigner(sigAlgSpec.validatedSpec(this), this)
+        }
         return BaseSigner(sigAlgSpec.validatedSpec(this), this)
     }
 }
