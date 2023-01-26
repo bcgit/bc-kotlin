@@ -13,11 +13,8 @@ import org.bouncycastle.kcrypto.spec.asymmetric.*
 import org.bouncycastle.kcrypto.spec.kdf.PBKDF2Spec
 import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.*
-import org.bouncycastle.pqc.jcajce.spec.DilithiumParameterSpec
-import org.bouncycastle.pqc.jcajce.spec.FalconParameterSpec
-import org.bouncycastle.pqc.jcajce.spec.LMSHSSKeyGenParameterSpec
-import org.bouncycastle.pqc.jcajce.spec.LMSKeyGenParameterSpec
-import org.bouncycastle.pqc.jcajce.spec.SPHINCSPlusParameterSpec
+import org.bouncycastle.pqc.jcajce.provider.NTRU
+import org.bouncycastle.pqc.jcajce.spec.*
 import java.security.Provider
 import java.security.SecureRandom
 import java.security.Security
@@ -151,6 +148,16 @@ class KCryptoServices {
             if (keySpec is RSAGenSpec) {
                 val kpGen = helper.createKeyPairGenerator("RSA");
                 kpGen.initialize(RSAKeyGenParameterSpec(keySpec.keySize, keySpec.publicExponent), keySpec.random)
+                return EncryptingKeyPair(KeyPair(kpGen.generateKeyPair()));
+            }
+            if (keySpec is KyberGenSpec) {
+                val kpGen = pqcHelper.createKeyPairGenerator("Kyber");
+                kpGen.initialize(KyberParameterSpec.fromName(keySpec.parameterSet), keySpec.random)
+                return EncryptingKeyPair(KeyPair(kpGen.generateKeyPair()));
+            }
+            if (keySpec is NTRUGenSpec) {
+                val kpGen = pqcHelper.createKeyPairGenerator("NTRU");
+                kpGen.initialize(NTRUParameterSpec.fromName(keySpec.parameterSet), keySpec.random)
                 return EncryptingKeyPair(KeyPair(kpGen.generateKeyPair()));
             }
             throw IllegalArgumentException("unknown KeyGenSpec")

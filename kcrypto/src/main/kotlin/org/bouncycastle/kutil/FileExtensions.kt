@@ -10,8 +10,10 @@ import org.bouncycastle.kcrypto.KeyPair
 import org.bouncycastle.kcrypto.SigningKey
 import org.bouncycastle.kcrypto.cert.CRL
 import org.bouncycastle.kcrypto.cert.Certificate
+import org.bouncycastle.kcrypto.cmp.ProtectedPKIMessage
 import org.bouncycastle.kcrypto.cms.CertificateManagementMessage
 import org.bouncycastle.kcrypto.cms.SignedData
+import org.bouncycastle.kcrypto.crmf.CertificateRequest
 import org.bouncycastle.kcrypto.pkcs.PKCS10Request
 import org.bouncycastle.kcrypto.pkcs.PKCS8EncryptedPrivateKey
 import org.bouncycastle.openssl.MiscPEMGenerator
@@ -36,6 +38,8 @@ fun OutputStreamWriter.writePEMObject(obj: Encodable) {
         is SigningKey -> pw.writeObject(MiscPEMGenerator(PrivateKeyInfo.getInstance(obj.encoding)))
         is DecryptionKey -> pw.writeObject(MiscPEMGenerator(PrivateKeyInfo.getInstance(obj.encoding)))
         is Certificate -> pw.writeObject(MiscPEMGenerator(X509CertificateHolder(obj.encoding)))
+        is CertificateRequest -> pw.writeObject(PemObject("CRMF MESSAGE", obj.encoding))
+        is ProtectedPKIMessage -> pw.writeObject(PemObject("CMP MESSAGE", obj.encoding))
         is PKCS10Request -> pw.writeObject(MiscPEMGenerator(PKCS10CertificationRequest(obj.encoding)))
         is PKCS8EncryptedPrivateKey -> pw.writeObject(PemObject("ENCRYPTED PRIVATE KEY", obj.encoding))
         is CertificateManagementMessage -> pw.writeObject(PemObject("PKCS7", obj.encoding))

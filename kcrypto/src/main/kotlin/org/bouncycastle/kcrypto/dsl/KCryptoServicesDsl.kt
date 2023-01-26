@@ -154,6 +154,26 @@ fun EncryptingKeyBuilder.rsa(block: RsaParams.() -> Unit) {
 }
 
 /**
+ * Initialize a Kyber key pair.
+ * @param block initialization block
+ */
+fun EncryptingKeyBuilder.kyber(block: KyberParams.() -> Unit) {
+    val p = KyberParams().apply(block)
+
+    setSpec(KyberGenSpec(p.paramSet, KCryptoServices.secureRandom))
+}
+
+/**
+ * Initialize a NTRU key pair.
+ * @param block initialization block
+ */
+fun EncryptingKeyBuilder.ntru(block: NtruParams.() -> Unit) {
+    val p = NtruParams().apply(block)
+
+    setSpec(NTRUGenSpec(p.paramSet, KCryptoServices.secureRandom))
+}
+
+/**
  * RSA Parameters
  */
 data class RsaParams(
@@ -162,6 +182,16 @@ data class RsaParams(
     var publicExponent: BigInteger = RSAKeyGenParameterSpec.F4
 ) {
 }
+
+/**
+ * Kyber Parameters
+ */
+data class KyberParams(var paramSet: String = "kyber512")
+
+/**
+ * NTRU Parameters
+ */
+data class NtruParams(var paramSet: String = "ntruhrss701")
 
 /**
  * EC Parameters

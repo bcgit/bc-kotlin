@@ -38,7 +38,7 @@ class PKCS10Body
 }
 
 /**
- * DLS for creating a pkcs10Request
+ * DSL for creating a pkcs10Request
  */
 fun pkcs10Request(block: PKCS10Body.()-> Unit): PKCS10Request = PKCS10Body().apply(block).build()
 
