@@ -2,12 +2,10 @@ package org.bouncycastle.kutil
 
 import KCryptoServices
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.cert.X509CRLHolder
 import org.bouncycastle.cert.X509CertificateHolder
-import org.bouncycastle.kcrypto.DecryptionKey
-import org.bouncycastle.kcrypto.Encodable
-import org.bouncycastle.kcrypto.KeyPair
-import org.bouncycastle.kcrypto.SigningKey
+import org.bouncycastle.kcrypto.*
 import org.bouncycastle.kcrypto.cert.CRL
 import org.bouncycastle.kcrypto.cert.Certificate
 import org.bouncycastle.kcrypto.cmp.ProtectedPKIMessage
@@ -37,6 +35,8 @@ fun OutputStreamWriter.writePEMObject(obj: Encodable) {
     when (obj) {
         is SigningKey -> pw.writeObject(MiscPEMGenerator(PrivateKeyInfo.getInstance(obj.encoding)))
         is DecryptionKey -> pw.writeObject(MiscPEMGenerator(PrivateKeyInfo.getInstance(obj.encoding)))
+        is VerificationKey -> pw.writeObject(MiscPEMGenerator(SubjectPublicKeyInfo.getInstance(obj.encoding)))
+        is EncryptionKey -> pw.writeObject(MiscPEMGenerator(SubjectPublicKeyInfo.getInstance(obj.encoding)))
         is Certificate -> pw.writeObject(MiscPEMGenerator(X509CertificateHolder(obj.encoding)))
         is CertificateRequest -> pw.writeObject(PemObject("CRMF MESSAGE", obj.encoding))
         is ProtectedPKIMessage -> pw.writeObject(PemObject("CMP MESSAGE", obj.encoding))
