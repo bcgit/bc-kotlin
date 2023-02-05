@@ -170,7 +170,7 @@ fun EncryptingKeyBuilder.kyber(block: KyberParams.() -> Unit) {
 fun EncryptingKeyBuilder.ntru(block: NtruParams.() -> Unit) {
     val p = NtruParams().apply(block)
 
-    setSpec(NTRUGenSpec(p.paramSet, KCryptoServices.secureRandom))
+    setSpec(NTRUGenSpec(p.parameterSet, KCryptoServices.secureRandom))
 }
 
 /**
@@ -191,7 +191,7 @@ data class KyberParams(var paramSet: String = "kyber512")
 /**
  * NTRU Parameters
  */
-data class NtruParams(var paramSet: String = "ntruhrss701")
+data class NtruParams(var parameterSet: String = "ntruhrss701")
 
 /**
  * EC Parameters

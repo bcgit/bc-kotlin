@@ -1,19 +1,15 @@
-import org.bouncycastle.asn1.cmp.PKIBody
-import org.bouncycastle.asn1.crmf.SubsequentMessage
+import org.bouncycastle.asn1.ASN1Primitive
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.GeneralName
 import org.bouncycastle.asn1.x509.KeyUsage
-import org.bouncycastle.cert.cmp.ProtectedPKIMessage
-import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder
-import org.bouncycastle.crypto.macs.HMac
 import org.bouncycastle.kcrypto.cert.dsl.*
 import org.bouncycastle.kcrypto.cmp.dsl.protectedPkiMessage
-import org.bouncycastle.kcrypto.crmf.CertificateRequest
 import org.bouncycastle.kcrypto.crmf.dsl.certificateRequest
 import org.bouncycastle.kcrypto.dsl.*
+import org.bouncycastle.kutil.ASN1Dump
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
@@ -25,7 +21,13 @@ fun main() {
 
     var kp = encryptingKeyPair {
         ntru {
-            paramSet = "ntruhrss701"
+            parameterSet = "ntruhrss701"
+        }
+    }
+
+    var sigKp = signingKeyPair {
+        dilithium {
+            parameterSet = "dilithium2"
         }
     }
 
@@ -64,7 +66,7 @@ fun main() {
     val sender = GeneralName(X500Name("CN=Kyber Subject"))
     val recipient = GeneralName(X500Name("CN=Dilithium Issuer"))
 
-    var message = protectedPkiMessage {
+    var macMessage = protectedPkiMessage {
         this.sender = sender
         this.recipient = recipient
         
@@ -77,7 +79,24 @@ fun main() {
         }
     }
 
+    var sigMessage = protectedPkiMessage {
+        this.sender = sender
+        this.recipient = recipient
+
+        initReq {
+             addRequest(crmfReq)
+        }
+
+        signature {
+            Dilithium using sigKp.signingKey
+        }
+    }
+
     OutputStreamWriter(System.out).writePEMObject(kp.decryptionKey)
 
-    OutputStreamWriter(System.out).writePEMObject(message)
+    OutputStreamWriter(System.out).writePEMObject(kp.encryptionKey)
+
+    OutputStreamWriter(System.out).writePEMObject(macMessage)
+
+    OutputStreamWriter(System.out).writePEMObject(sigMessage)
 }

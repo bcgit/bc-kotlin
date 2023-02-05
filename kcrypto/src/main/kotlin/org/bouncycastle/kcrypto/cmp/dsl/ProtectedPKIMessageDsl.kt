@@ -2,17 +2,21 @@ package org.bouncycastle.kcrypto.cmp.dsl
 
 import org.bouncycastle.asn1.cmp.PKIBody
 import org.bouncycastle.asn1.crmf.CertReqMsg
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.asn1.x509.GeneralName
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder
 import org.bouncycastle.cert.crmf.CertificateReqMessagesBuilder
 import org.bouncycastle.cert.crmf.CertificateRequestMessage
 import org.bouncycastle.kcrypto.Digest
 import org.bouncycastle.kcrypto.ID
+import org.bouncycastle.kcrypto.SignatureCalculator
 import org.bouncycastle.kcrypto.cmp.ProtectedPKIMessage
 import org.bouncycastle.kcrypto.crmf.CertificateRequest
 import org.bouncycastle.kcrypto.dsl.SignatureBlock
+import org.bouncycastle.operator.ContentSigner
 import org.bouncycastle.operator.MacCalculator
 import org.bouncycastle.pkcs.jcajce.JcePBMac1CalculatorBuilder
+import java.io.OutputStream
 
 /**
  * DSL for block whose methods will return a calculator or a pkcs10RequestBuilder
@@ -31,6 +35,20 @@ class MacBlock
                     JcePBMac1CalculatorBuilder(mac.algName, mac.size).setProvider("BC").build(mac.passwd.toCharArray())
 
         return senderMacCalculator
+    }
+}
+
+class Signer(val signatureCalculator: SignatureCalculator<AlgorithmIdentifier>) : ContentSigner {
+    override fun getAlgorithmIdentifier(): AlgorithmIdentifier {
+        return signatureCalculator.algorithmIdentifier
+    }
+
+    override fun getOutputStream(): OutputStream {
+        return signatureCalculator.stream
+    }
+
+    override fun getSignature(): ByteArray {
+        return signatureCalculator.signature()
     }
 }
 
@@ -59,7 +77,8 @@ class ProtPKIBody {
     val messagesBody = RequestMessagesBody()
 
     val mac = MacBlock();
-    val signature = SignatureBlock();
+
+    var signature: SignatureBlock? = null;
 
     fun build(): ProtectedPKIMessage {
         val bld = ProtectedPKIMessageBuilder(sender, recipient)
@@ -73,15 +92,23 @@ class ProtPKIBody {
         // TODO: clearly incomplete
         bld.setBody(PKIBody.TYPE_INIT_REQ, msgsBldr.build())
 
-        // TODO: add signature support
-        return ProtectedPKIMessage(bld.build(mac.build()))
+        var sigCalc = signature?.signatureCalculator()
+        if (sigCalc != null) {
+            return ProtectedPKIMessage(bld.build(Signer(sigCalc)))
+        } else {
+            return ProtectedPKIMessage(bld.build(mac.build()))
+        }
     }
 
     fun initReq(block: RequestMessagesBody.()-> Unit) = messagesBody.apply(block)
 
     fun mac(block: MacBlock.()-> Unit) = mac.apply(block)
 
-    fun signature(block: SignatureBlock.()-> Unit) = signature.apply(block)
+    fun signature(block: SignatureBlock.()-> Unit) {
+        val sb = SignatureBlock();
+        sb.apply(block)
+        signature = sb;
+    }
 }
 
 class RequestMessagesBody {
