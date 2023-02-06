@@ -11,6 +11,7 @@ import org.bouncycastle.kcrypto.SymmetricKey
 import org.bouncycastle.kcrypto.spec.KeyGenSpec
 import org.bouncycastle.kcrypto.spec.kdf.PBKDF2Spec
 import org.bouncycastle.kcrypto.spec.symmetric.AESGenSpec
+import org.bouncycastle.kcrypto.spec.symmetric.HMacGenSpec
 import javax.crypto.spec.SecretKeySpec
 
 internal class PBKDF2PbKdf(val skdfConf: PBKDF2Spec, val keySpec: KeyGenSpec) : PBKDF {
@@ -19,11 +20,13 @@ internal class PBKDF2PbKdf(val skdfConf: PBKDF2Spec, val keySpec: KeyGenSpec) : 
 
         val keySize = when (keySpec) {
             is AESGenSpec -> keySpec.keySize
+            is HMacGenSpec -> keySpec.keySize
             else -> throw IllegalStateException("unknown KeyGenSpec in PBKDF2")
         }
 
         val keyAlg = when (keySpec) {
             is AESGenSpec -> "AES"
+            is HMacGenSpec -> "HMAC"
             else -> throw IllegalStateException("unknown KeyGenSpec in PBKDF2")
         }
 
@@ -46,7 +49,7 @@ internal class PBKDF2PbKdf(val skdfConf: PBKDF2Spec, val keySpec: KeyGenSpec) : 
         val fact = KCryptoServices.helper.createSecretKeyFactory(hmacAlg)
         val sKey = fact.generateSecret(pbkdfKey)
 
-        return PBESymmetricKey(keySpec.keySize, SecretKeySpec(sKey.encoded, keyAlg), PKCSObjectIdentifiers.id_PBES2, KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2, params))
+        return PBESymmetricKey(keySize, SecretKeySpec(sKey.encoded, keyAlg), PKCSObjectIdentifiers.id_PBES2, KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2, params))
     }
 }
 

@@ -112,6 +112,12 @@ class PBKDF2Details {
     var prf = sha1
 }
 
+class BasePBKDFDetails {
+    var saltLength = 20
+    var iterationCount = 16384
+    var keySize = 256
+}
+
 /**
  * DSL for specifying an encryptor.
  */

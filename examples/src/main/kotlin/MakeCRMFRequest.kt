@@ -1,4 +1,3 @@
-import org.bouncycastle.asn1.ASN1Primitive
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.BasicConstraints
@@ -9,7 +8,6 @@ import org.bouncycastle.kcrypto.cert.dsl.*
 import org.bouncycastle.kcrypto.cmp.dsl.protectedPkiMessage
 import org.bouncycastle.kcrypto.crmf.dsl.certificateRequest
 import org.bouncycastle.kcrypto.dsl.*
-import org.bouncycastle.kutil.ASN1Dump
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
@@ -75,7 +73,10 @@ fun main() {
         }
 
         mac {
-            HMacSha256 using "secret"
+            HMacSha256 with PBKDF2 {
+                saltLength = 32
+                keySize = 256
+            } using "secret"
         }
     }
 
