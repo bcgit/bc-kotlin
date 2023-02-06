@@ -12,6 +12,7 @@ import org.bouncycastle.kcrypto.SymmetricKey
 import org.bouncycastle.kcrypto.spec.KeyGenSpec
 import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.AESGenSpec
+import org.bouncycastle.kcrypto.spec.symmetric.HMacGenSpec
 
 import javax.crypto.spec.SecretKeySpec
 
@@ -19,22 +20,30 @@ internal class ScryptPbKdf(val skdfConf: ScryptSpec, val keySpec: KeyGenSpec) : 
 
     override fun symmetricKey(password: CharArray): SymmetricKey {
 
+        val keySize : Int
+        if (keySpec is AESGenSpec) {
+            keySize = (keySpec.keySize + 7) / 8
+        } else {
+            keySize = ((keySpec as HMacGenSpec).keySize + 7) / 8
+        }
+        val keyLen = (keySize + 7) / 8
+
         val params = ScryptParams(
             skdfConf.salt,
             skdfConf.costParameter,
             skdfConf.blockSize,
             skdfConf.parallelizationParameter,
-            ((keySpec as AESGenSpec).keySize + 7) / 8
+            keyLen
         )
 
         val key = if (KCryptoServices._provider!!.name.equals("BC")) {
-            bcScrypt(password, (keySpec.keySize + 7) / 8, params)
+            bcScrypt(password, keyLen, params)
         } else {
-            fipsScrypt(password, (keySpec.keySize + 7) / 8, params)
+            fipsScrypt(password, keyLen, params)
         }
 
         return PBESymmetricKey(
-            keySpec.keySize,
+            keySize,
             SecretKeySpec(key, "AES"),
             PKCSObjectIdentifiers.id_PBES2,
             KeyDerivationFunc(MiscObjectIdentifiers.id_scrypt, params)
