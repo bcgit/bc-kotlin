@@ -21,7 +21,7 @@ To build put desired versions of BC jars in the directory bc-jars-reg and build 
 
 > gradle build
 
-BC version 1.72b13 or later is required to build due to PQC support for Falcon and Dilithium.
+BC version 1.73b12 or later is required to build due to PQC support.
 
 ## Running
 
@@ -38,11 +38,11 @@ Examples of running kotlin script examples:
 
 `kotlinc -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-fips/bc-fips-1.0.2.3.jar:bc-jars-fips/bcpkix-fips-1.0.6.jar -script scripts/MakeFullPath.kts`
 
-`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar scripts/Falcon.kts`
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-jdk18on-173b12.jar:bc-jars-reg/bcpkix-jdk18on-173b12.jar:bc-jars-reg/bcutil-jdk18on-173b12.jar scripts/Falcon.kts`
 
 You can also run kotlin interactively like:
 ```
-kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar
+kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-jdk18on-173b12.jar:bc-jars-reg/bcpkix-jdk18on-173b12.jar:bc-jars-reg/bcutil-jdk18on-173b12.jar
 >>> :load scripts/Falcon.kts
 ```
 
@@ -57,7 +57,7 @@ cd ..
 ```
 Run 'main' methods in the examples:
 
-`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-ext-jdk18on-172b13.jar:bc-jars-reg/bcpkix-jdk18on-172b13.jar:bc-jars-reg/bcutil-jdk18on-172b13.jar:examples/build/classes/kotlin/main MakeV3SelfSignedCertificateKt'
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-jdk18on-173b12.jar:bc-jars-reg/bcpkix-jdk18on-173b12.jar:bc-jars-reg/bcutil-jdk18on-173b12.jar:examples/build/classes/kotlin/main MakeV3SelfSignedCertificateKt`
 
 ## Feedback and Contributions
 
