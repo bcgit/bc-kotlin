@@ -22,6 +22,8 @@ class CertBody
     lateinit var subjectPublicKey: VerificationKey
 
     private val signature = SignatureBlock()
+    private val altSignature = SignatureBlock()
+    var altSignatureUsed: Boolean = false
 
     fun build(): Certificate
     {
@@ -35,7 +37,12 @@ class CertBody
             throw IllegalArgumentException("unknown issuer type")
         }
 
-        var builder = CertificateBuilder(signature.signatureCalculator(), issuerName)
+        var builder: CertificateBuilder
+        if (altSignatureUsed) {
+            builder = CertificateBuilder(signature.signatureCalculator(), altSignature.signatureCalculator(), issuerName)
+        } else {
+            builder = CertificateBuilder(signature.signatureCalculator(), issuerName)
+        }
 
         builder.setNotAfter(notAfter)
         builder.setNotBefore(notBefore)
@@ -48,6 +55,11 @@ class CertBody
     }
 
     fun signature(block: SignatureBlock.()-> Unit) = signature.apply(block)
+
+    fun altSignature(block: SignatureBlock.()-> Unit) {
+        altSignatureUsed = true;
+        altSignature.apply(block)
+    }
 }
 
 
