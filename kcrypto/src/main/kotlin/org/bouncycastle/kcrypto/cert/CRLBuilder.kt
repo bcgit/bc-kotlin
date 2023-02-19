@@ -302,4 +302,16 @@ open class V2CRLBuilder {
 
         return CRL(crlBuilder.build(KContentSigner(signingKey.signatureCalculator(sigAlgSpec))))
     }
+
+    /**
+     * Generate an X.509 CRL, based on the current issuer and subject
+     * using the passed in signatureCalculator.
+     *
+     * @param signatureCalculator the signature calculator to use to sign the CRL.
+     * @return a holder containing the resulting signed certificate.
+     */
+    fun build(signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, isCritical: Boolean, altSignatureCalculator: SignatureCalculator<AlgorithmIdentifier>): CRL {
+
+        return CRL(crlBuilder.build(KContentSigner(signatureCalculator), isCritical, KContentSigner(altSignatureCalculator)))
+    }
 }

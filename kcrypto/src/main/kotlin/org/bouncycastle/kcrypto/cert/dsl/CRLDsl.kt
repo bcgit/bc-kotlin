@@ -22,7 +22,10 @@ class CRLBody
     var extensions: Extensions? = null
 
     private val signature = SignatureBlock()
+    private val altSignature = SignatureBlock()
     private val crlEntries = CRLEntryBlock()
+
+    var altSignatureUsed: Boolean = false
 
     fun build(): CRL
     {
@@ -42,10 +45,18 @@ class CRLBody
 
         addExtensions(builder, extensions)
 
+        if (altSignatureUsed) {
+            return builder.build(signature.signatureCalculator(), false, altSignature.signatureCalculator())
+        }
         return builder.build(signature.signatureCalculator())
     }
 
     fun signature(block: SignatureBlock.()-> Unit) = signature.apply(block)
+
+    fun altSignature(block: SignatureBlock.()-> Unit) {
+        altSignatureUsed = true;
+        altSignature.apply(block)
+    }
 
     fun revocation(block: CRLEntryBlock.()-> Unit) = crlEntries.apply(block).addEntry()
 }
@@ -98,7 +109,10 @@ class CRLUpdateBody
     var extensions: Extensions? = null
 
     private val signature = SignatureBlock()
+    private val altSignature = SignatureBlock()
     private val crlEntries = CRLEntryBlock()
+
+    var altSignatureUsed: Boolean = false
 
     fun build(crl: CRL): CRL
     {
@@ -118,11 +132,19 @@ class CRLUpdateBody
 
         addExtensions(builder, extensions)
 
+        if (altSignatureUsed) {
+            return builder.build(signature.signatureCalculator(), false, altSignature.signatureCalculator())
+        }
         return builder.build(signature.signatureCalculator())
     }
 
     fun signature(block: SignatureBlock.()-> Unit) = signature.apply(block)
 
+    fun altSignature(block: SignatureBlock.()-> Unit) {
+        altSignatureUsed = true;
+        altSignature.apply(block)
+    }
+    
     fun revocation(block: CRLEntryBlock.()-> Unit) = crlEntries.apply(block).addEntry()
 }
 

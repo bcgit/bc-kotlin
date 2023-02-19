@@ -1,9 +1,6 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.dilithium
-import org.bouncycastle.kcrypto.dsl.edDsa
-import org.bouncycastle.kcrypto.dsl.signingKeyPair
-import org.bouncycastle.kcrypto.dsl.using
+import org.bouncycastle.kcrypto.dsl.*
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
@@ -15,15 +12,15 @@ fun main() {
 
     using(findBCProvider())
 
-    var kp = signingKeyPair {
-        edDsa {
-            curveName = "Ed25519"
+    var sigKp = signingKeyPair {
+        dilithium {
+            parameterSet = "dilithium2"
         }
     }
 
-    var altKp = signingKeyPair {
-        dilithium {
-            parameterSet = "Dilithium2"
+    var encKp = encryptingKeyPair {
+        ntru {
+            parameterSet = "ntruhrss701"
         }
     }
 
@@ -42,27 +39,23 @@ fun main() {
         issuer = name
         notAfter = expDate
         subject = name
-        subjectPublicKey = kp.verificationKey
+        subjectPublicKey = sigKp.verificationKey
 
         extensions = extensions {
             subjectAltPublicKeyInfoExtension {
-                publicKey = altKp.verificationKey
+                publicKey = encKp.encryptionKey
             }
         }
         
         signature {
-            EdDSA using kp.signingKey
-        }
-        altSignature {
-            Dilithium using altKp.signingKey
+            Dilithium using sigKp.signingKey
         }
     }
 
     println("cert verifies " + cert.signatureVerifiedBy(cert))
-    println("cert alternative signature verifies " + cert.alternativeSignatureVerifiedBy(altKp.verificationKey))
 
     var encKey = encryptedPrivateKey {
-        privateKey = kp.signingKey
+        privateKey = sigKp.signingKey
         encryption {
             AESKWP using SCRYPT {
                 saltLength = 20

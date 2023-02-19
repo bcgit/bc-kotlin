@@ -23,6 +23,7 @@ class CertBody
 
     private val signature = SignatureBlock()
     private val altSignature = SignatureBlock()
+    
     var altSignatureUsed: Boolean = false
 
     fun build(): Certificate

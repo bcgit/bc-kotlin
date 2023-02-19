@@ -3,7 +3,6 @@ package org.bouncycastle.kcrypto.cert.dsl
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.X500Name
-import org.bouncycastle.asn1.x500.X500NameBuilder
 import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.kcrypto.PublicKey
@@ -133,6 +132,19 @@ fun ExtensionsBody.subjectAltNameExtension(block: GeneralNamesBuilder.() -> Unit
     return e
 }
 
+fun ExtensionsBody.subjectAltPublicKeyInfoExtension(block: ExtSubjectAltPublicKeyInfo.() -> Unit): Ext
+{
+    var ea = ExtSubjectAltPublicKeyInfo().apply(block)
+    var e = Ext(ea.isCritical)
+
+    e.extOid = Extension.subjectAltPublicKeyInfo
+    e.extValue = SubjectAltPublicKeyInfo(SubjectPublicKeyInfo.getInstance(ea.publicKey.encoding))
+
+    addExtension(e)
+
+    return e
+}
+
 fun ExtensionsBody.issuerAltNameExtension(block: GeneralNamesBuilder.() -> Unit): Ext
 {
     var e = Ext(false)
@@ -163,6 +175,11 @@ data class ExtBasicConstraints(var isCritical: Boolean = false)
 data class ExtAuthorityKeyId(var isCritical: Boolean = false)
 {
     lateinit var authorityKey: Any
+}
+
+data class ExtSubjectAltPublicKeyInfo(var isCritical: Boolean = false)
+{
+    lateinit var publicKey: PublicKey
 }
 
 fun GeneralNamesBuilder.email(value: String) {

@@ -49,6 +49,35 @@ fun main() {
                 publicKey = altKp.verificationKey
             }
         }
+
+        signature {
+            EdDSA using kp.signingKey
+        }
+        altSignature {
+            Dilithium using altKp.signingKey
+        }
+    }
+
+    var exts = extensions {
+        authorityKeyIdentifierExtension {
+            authorityKey = cert
+        }
+    }
+
+    // empty CRL.
+    var crl = crl {
+        issuer = cert
+
+        revocation {
+            userCert = BigInteger.ONE
+            reason = certificateHold
+        }
+        revocation {
+            userCert = cert
+            reason = keyCompromise
+        }
+
+        extensions = exts
         
         signature {
             EdDSA using kp.signingKey
@@ -58,17 +87,30 @@ fun main() {
         }
     }
 
+    // Example of updating
+    var crl2 = crl updateWith {
+
+        revocation {
+            userCert = BigInteger.valueOf(2)
+            reason = keyCompromise
+        }
+
+        signature {
+            EdDSA using kp.signingKey
+        }
+        altSignature {
+            Dilithium using altKp.signingKey
+        }
+    }
+
     println("cert verifies " + cert.signatureVerifiedBy(cert))
-    println("cert alternative signature verifies " + cert.alternativeSignatureVerifiedBy(altKp.verificationKey))
+    println("crl verifies " + crl.signatureVerifiedBy(cert))
 
     var encKey = encryptedPrivateKey {
         privateKey = kp.signingKey
         encryption {
-            AESKWP using SCRYPT {
+            AESKWP using PBKDF2 {
                 saltLength = 20
-                costParameter = 1048576
-                blockSize = 8
-                parallelization = 1
                 keySize = 256
             } with "Test".toCharArray()
         }
@@ -77,4 +119,6 @@ fun main() {
     OutputStreamWriter(System.out).writePEMObject(encKey)
 
     OutputStreamWriter(System.out).writePEMObject(cert)
+
+    OutputStreamWriter(System.out).writePEMObject(crl)
 }
