@@ -79,6 +79,29 @@ class Certificate(encoding: ByteArray): Encodable
     }
 
     /**
+     * Verify the signature on this certificate using the passed in certificate.
+     *
+     * @param cert the X.509 certificate that contains the public key to verify the signature on this certificate.
+     * @return true if the certificate's signature is verified by the certificate's key, false otherwise.
+     */
+    fun alternativeSignatureVerifiedBy(pubKey: VerificationKey): Boolean
+    {
+       return alternativeSignatureVerifiedBy(pubKey, null)
+    }
+
+    /**
+     * Verify the signature on this certificate using the passed in public key.
+     *
+     * @param pubKey the public key to verify the signature on this certificate.
+     * @param id an ID string to associate with the signature generator.
+     * @return true if the certificate's signature is verified by the key, false otherwise.
+     */
+    fun alternativeSignatureVerifiedBy(pubKey: VerificationKey, id: ID?): Boolean
+    {
+        return _cert.isAlternativeSignatureValid(VerifierProv(null, pubKey, id))
+    }
+
+    /**
      * Return the public key in this certificate as a signature verification key.
      *
      * @return public key as a VerificationKey

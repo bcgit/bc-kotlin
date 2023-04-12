@@ -22,9 +22,9 @@ internal class ScryptPbKdf(val skdfConf: ScryptSpec, val keySpec: KeyGenSpec) : 
 
         val keySize : Int
         if (keySpec is AESGenSpec) {
-            keySize = (keySpec.keySize + 7) / 8
+            keySize = keySpec.keySize
         } else {
-            keySize = ((keySpec as HMacGenSpec).keySize + 7) / 8
+            keySize = (keySpec as HMacGenSpec).keySize
         }
         val keyLen = (keySize + 7) / 8
 

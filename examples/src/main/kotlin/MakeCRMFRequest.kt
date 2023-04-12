@@ -73,7 +73,7 @@ fun main() {
         }
 
         mac {
-            HMacSha256 with PBKDF2 {
+            HMacSha256 with SCRYPT {
                 saltLength = 32
                 keySize = 256
             } using "secret"

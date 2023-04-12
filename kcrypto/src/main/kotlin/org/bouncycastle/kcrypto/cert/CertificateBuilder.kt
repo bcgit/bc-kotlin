@@ -40,7 +40,15 @@ private class Signer(var s: SignatureCalculator<AlgorithmIdentifier>) : ContentS
  * @param signatureCalculator the signature calculator based on the issuer's private key.
  * @param issuerName the X.500 name for the certificate issuer.
  */
-class CertificateBuilder(private val signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, private val issuerName: X500Name) {
+class CertificateBuilder(private val signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, private val altSignatureCalculator: SignatureCalculator<AlgorithmIdentifier>?, private val issuerName: X500Name) {
+
+    /**
+     * Create an X.509 certificate builder based on this signing key for the passed in signature specification.
+     *
+     * @param signatureCalculator the calculator to use to sign the final certificate.
+     * @param issuerName the X.500 Name to use as the certificate issuer name.
+     */
+    constructor(signatureCalculator: SignatureCalculator<AlgorithmIdentifier>, issuerName: X500Name): this(signatureCalculator, null, issuerName)
 
     /**
      * Create an X.509 certificate builder based on this signing key for the passed in signature specification.
@@ -49,7 +57,7 @@ class CertificateBuilder(private val signatureCalculator: SignatureCalculator<Al
      * @param sigAlgSpec name of the signature algorithm the calculator is for.
      * @param issuerName the X.500 Name to use as the certificate issuer name.
      */
-    constructor(signingKey: SigningKey, sigAlgSpec: SigAlgSpec, issuerName: X500Name): this(signingKey.signatureCalculator(sigAlgSpec), issuerName)
+    constructor(signingKey: SigningKey, sigAlgSpec: SigAlgSpec, issuerName: X500Name): this(signingKey.signatureCalculator(sigAlgSpec), null, issuerName)
 
     /**
      * Create an X.509 certificate builder based on this signing key for the passed in signature specification.
@@ -58,7 +66,7 @@ class CertificateBuilder(private val signatureCalculator: SignatureCalculator<Al
      * @param sigAlgSpec name of the signature algorithm the calculator is for.
      * @param issuerCert the Certificate to use as the source of the certificate issuer name.
      */
-    constructor(signingKey: SigningKey, sigAlgSpec: SigAlgSpec, issuerCert: Certificate): this(signingKey.signatureCalculator(sigAlgSpec), issuerCert._cert.subject)
+    constructor(signingKey: SigningKey, sigAlgSpec: SigAlgSpec, issuerCert: Certificate): this(signingKey.signatureCalculator(sigAlgSpec), null, issuerCert._cert.subject)
 
     private var notAfter: Date = Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000) // one year
     private var notBefore: Date = Date(System.currentTimeMillis() - 1000)
@@ -143,7 +151,8 @@ class CertificateBuilder(private val signatureCalculator: SignatureCalculator<Al
 
         val exts = extensions
 
-        if (extSet) {
+        // if altSignatureCalculator is not null we need to add extensions ourselves.
+        if (extSet || altSignatureCalculator != null) {
             var bldr = X509v3CertificateBuilder(
                     issuerName, serialNumber, notBefore, notAfter, subjectName, publicKeyInfo)
 
@@ -153,6 +162,9 @@ class CertificateBuilder(private val signatureCalculator: SignatureCalculator<Al
                 }
             }
 
+            if (altSignatureCalculator != null) {
+                return Certificate(bldr.build(Signer(signatureCalculator), false, Signer(altSignatureCalculator)).encoded)
+            }
             return Certificate(bldr.build(Signer(signatureCalculator)).encoded)
         }
         else {
