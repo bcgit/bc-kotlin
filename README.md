@@ -59,6 +59,10 @@ Run 'main' methods in the examples:
 
 `kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-jdk18on-173.jar:bc-jars-reg/bcpkix-jdk18on-173.jar:bc-jars-reg/bcutil-jdk18on-173.jar:examples/build/classes/kotlin/main MakeV3SelfSignedCertificateKt`
 
+For hybrid certificates and CRL (X.509 alternative signatures):
+
+`kotlin -cp kcrypto/build/libs/bc-kcrypto-0.0.9.jar:bc-jars-reg/bcprov-jdk18on-173.jar:bc-jars-reg/bcpkix-jdk18on-173.jar:bc-jars-reg/bcutil-jdk18on-173.jar:examples/build/classes/kotlin/main MakeDualCertificateAndDualCrlKt`
+
 ## Feedback and Contributions
 
 If you want to provide feedback directly to the members of **The Legion** then please use [feedback-crypto@bouncycastle.org](mailto:feedback-crypto@bouncycastle.org), if you want to help this project survive please consider [donating](https://www.bouncycastle.org/donate) or purchasing a support contract.
