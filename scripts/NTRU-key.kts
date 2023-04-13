@@ -1,10 +1,9 @@
 import org.bouncycastle.kcrypto.cert.dsl.*
 import org.bouncycastle.kcrypto.dsl.*
-import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
-import java.io.OutputStreamWriter
 import java.io.FileWriter
+import java.io.OutputStreamWriter
 
 
 using(findBCProvider())
