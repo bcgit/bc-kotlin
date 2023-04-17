@@ -15,13 +15,13 @@ The **scripts** directory contains easily modifiable kotlin scripts to generate 
 
 ## Building
 
-The gradle script has been tested with gradle-4.9 and later.
+The gradle script has been tested with gradle-6.8 and later. It appears they fail if a version of gradle later than 7.3 is used.
 
 To build put desired versions of BC jars in the directory bc-jars-reg and build with:
 
 > gradle build
 
-BC version 1.73 or later is required to build due to PQC support.
+BC version 1.73 or later is required to build due to PQC support. 
 
 ## Running
 
