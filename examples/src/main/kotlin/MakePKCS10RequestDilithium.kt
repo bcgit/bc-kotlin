@@ -4,10 +4,7 @@ import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.encryptingKeyPair
-import org.bouncycastle.kcrypto.dsl.rsa
-import org.bouncycastle.kcrypto.dsl.signingKeyPair
-import org.bouncycastle.kcrypto.dsl.using
+import org.bouncycastle.kcrypto.dsl.*
 import org.bouncycastle.kcrypto.pkcs.dsl.attribute
 import org.bouncycastle.kcrypto.pkcs.dsl.attributes
 import org.bouncycastle.kcrypto.pkcs.dsl.pkcs10Request
@@ -20,8 +17,8 @@ fun main() {
     using(findBCProvider())
 
     var kp = signingKeyPair {
-        rsa {
-            keySize = 2048
+        dilithium {
+            parameterSet = "dilithium2"
         }
     }
 
@@ -57,7 +54,7 @@ fun main() {
              }
         }
         signature {
-            PKCS1v1dot5 with sha256 using kp.signingKey
+            Dilithium using kp.signingKey
         }
     }
 
