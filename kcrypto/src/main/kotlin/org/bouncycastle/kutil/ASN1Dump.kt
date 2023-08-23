@@ -3,7 +3,6 @@ package org.bouncycastle.kutil
 import org.bouncycastle.asn1.*
 import org.bouncycastle.util.Strings
 import org.bouncycastle.util.encoders.Hex
-import java.io.IOException
 import kotlin.reflect.KVisibility
 
 /**
@@ -271,12 +270,6 @@ class ASN1Dump(val oidMap: Map<ASN1ObjectIdentifier, String>, val translateOids:
             buf.append(indent + "UTCTime(" + obj.time + ") " + nl)
         } else if (obj is ASN1GeneralizedTime) {
             buf.append(indent + "GeneralizedTime(" + obj.time + ") " + nl)
-        } else if (obj is BERApplicationSpecific) {
-            buf.append(outputApplicationSpecific("BER", indent, verbose, obj, nl))
-        } else if (obj is DERApplicationSpecific) {
-            buf.append(outputApplicationSpecific("DER", indent, verbose, obj, nl))
-        } else if (obj is DLApplicationSpecific) {
-            buf.append(outputApplicationSpecific("", indent, verbose, obj, nl))
         } else if (obj is ASN1Enumerated) {
             buf.append(indent + "DER Enumerated(" + obj.value + ")" + nl)
         } else if (obj is ASN1External) {
@@ -296,38 +289,6 @@ class ASN1Dump(val oidMap: Map<ASN1ObjectIdentifier, String>, val translateOids:
         } else {
             buf.append(indent + obj.toString() + nl)
         }
-    }
-
-    private fun outputApplicationSpecific(
-        type: String,
-        indent: String,
-        verbose: Boolean,
-        obj: ASN1Primitive,
-        nl: String
-    ): String {
-        val app = ASN1ApplicationSpecific.getInstance(obj)
-        val buf = StringBuffer()
-
-        if (app.isConstructed) {
-            try {
-                val s = ASN1Sequence.getInstance(app.getObject(BERTags.SEQUENCE))
-                buf.append(indent + type + " ApplicationSpecific[" + app.applicationTag + "]" + nl)
-                val e = s.objects
-                while (e.hasMoreElements()) {
-                    _dumpAsString(indent + TAB, verbose, e.nextElement() as ASN1Primitive, buf)
-                }
-            } catch (e: IOException) {
-                buf.append(e)
-            }
-
-            return buf.toString()
-        }
-
-        return indent + type + " ApplicationSpecific[" + app.applicationTag + "] (" + Strings.fromByteArray(
-            Hex.encode(
-                app.contents
-            )
-        ) + ")" + nl
     }
 
     /**

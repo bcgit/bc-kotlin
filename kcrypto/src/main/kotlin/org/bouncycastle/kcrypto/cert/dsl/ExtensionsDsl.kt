@@ -78,6 +78,19 @@ fun ExtensionsBody.subjectKeyIdentifierExtension(block: ExtSubjectKeyId.() -> Un
     return e
 }
 
+fun ExtensionsBody.keyUsageExtension(block: ExtKeyUsage.() -> Unit): Ext
+{
+    var es = ExtKeyUsage().apply(block)
+
+    var e = Ext(false)
+    e.extOid = Extension.keyUsage
+    e.extValue = KeyUsage(es.usage)
+
+    addExtension(e)
+
+    return e
+}
+
 fun ExtensionsBody.basicConstraintsExtension(block: ExtBasicConstraints.() -> Unit): Ext
 {
     var es = ExtBasicConstraints().apply(block)
@@ -164,6 +177,11 @@ data class Ext(internal val isCritical: Boolean = false)
 data class ExtSubjectKeyId(var isCritical: Boolean = false)
 {
     lateinit var subjectKey: PublicKey
+}
+
+data class ExtKeyUsage(var isCritical: Boolean = false)
+{
+    var usage: Int = 0
 }
 
 data class ExtBasicConstraints(var isCritical: Boolean = false)
