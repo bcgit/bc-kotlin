@@ -1,11 +1,16 @@
 package org.bouncycastle.kcrypto.dsl
 
 import KCryptoServices
+import org.bouncycastle.asn1.x509.Extensions
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.kcrypto.BaseSigningKey
 import org.bouncycastle.kcrypto.BaseVerificationKey
 import org.bouncycastle.kcrypto.SigningKey
 import org.bouncycastle.kcrypto.VerificationKey
 import org.bouncycastle.kcrypto.cert.Certificate
+import org.bouncycastle.kcrypto.cert.ExtensionsBuilder
+import org.bouncycastle.kcrypto.cert.dsl.Ext
+import org.bouncycastle.kcrypto.cert.dsl.ExtensionsBody
 import java.io.FileInputStream
 import java.security.KeyStore
 import java.security.PrivateKey
@@ -68,3 +73,21 @@ class KeyStoreBuilder {
         return ks;
     }
 }
+
+class KeyStoreBody
+{
+    lateinit var storeName: String
+    lateinit var storePassword: CharArray
+
+    var storeType: String = "BCFKS"
+    var fileName: String = "";
+
+    fun build(): KeyStore
+    {
+        var bldr = KeyStoreBuilder()
+
+        return bldr.build()
+    }
+}
+
+fun keyStore(block: KeyStoreBody.() -> Unit): KeyStore = KeyStoreBody().apply(block).build()

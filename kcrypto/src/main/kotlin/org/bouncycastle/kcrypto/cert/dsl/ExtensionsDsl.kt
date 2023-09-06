@@ -4,6 +4,7 @@ import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.*
+import org.bouncycastle.cert.DeltaCertificateTool
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.kcrypto.PublicKey
 import org.bouncycastle.kcrypto.VerificationKey
@@ -158,6 +159,23 @@ fun ExtensionsBody.subjectAltPublicKeyInfoExtension(block: ExtSubjectAltPublicKe
     return e
 }
 
+fun ExtensionsBody.deltaCertificateDescriptorExtension(block: ExtDeltaCertificateDescriptor.() -> Unit): Ext
+{
+    var ea = ExtDeltaCertificateDescriptor().apply(block)
+    var e = Ext(ea.isCritical)
+
+    var deltaExt = DeltaCertificateTool.makeDeltaCertificateExtension(ea.isCritical,
+        DeltaCertificateTool.signature + DeltaCertificateTool.subject
+        + DeltaCertificateTool.extensions + DeltaCertificateTool.signature, ea.deltaCert._cert)
+    
+    e.extOid = deltaExt.extnId
+    e.extValue = deltaExt.parsedValue
+
+    addExtension(e)
+
+    return e
+}
+
 fun ExtensionsBody.issuerAltNameExtension(block: GeneralNamesBuilder.() -> Unit): Ext
 {
     var e = Ext(false)
@@ -198,6 +216,11 @@ data class ExtAuthorityKeyId(var isCritical: Boolean = false)
 data class ExtSubjectAltPublicKeyInfo(var isCritical: Boolean = false)
 {
     lateinit var publicKey: PublicKey
+}
+
+data class ExtDeltaCertificateDescriptor(var isCritical: Boolean = false)
+{
+    lateinit var deltaCert: Certificate
 }
 
 fun GeneralNamesBuilder.email(value: String) {
