@@ -23,6 +23,12 @@ allprojects {
 }
 
 dependencies {
-	compile fileTree(dir: new File(rootDir, 'bc jars'), include: '*.jar')
+        // 3 jar files and the .gitkeep file
+        if (new File(rootDir, 'bc-jars-reg').list().length < 4) {
+            System.err.println("##### ERROR ##### BC jars not found in bc-jars-reg.")
+            System.err.println("##### ERROR ##### bcprov, bcpkix, and bcutil jars need to be copied into bc-jars-reg from a bc-java distribution.")
+            System.exit(1)
+        }
+	compile fileTree(dir: new File(rootDir, 'bc-jars-reg'), include: '*.jar')
 }
 
