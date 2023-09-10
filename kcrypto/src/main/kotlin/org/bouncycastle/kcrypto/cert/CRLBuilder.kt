@@ -142,6 +142,19 @@ open class V2CRLBuilder {
     }
 
     /**
+     * Add a CRL entry without extensions.
+     *
+     * @param userCertificateSerial serial number of revoked certificate.
+     * @param revocationDate date of certificate revocation.
+     * @return the current builder.
+     */
+    fun addCRLEntry(userCertificateSerial: BigInteger, revocationDate: Date): V2CRLBuilder {
+        crlBuilder.addCRLEntry(userCertificateSerial, revocationDate, null)
+
+        return this
+    }
+
+    /**
      * Add a CRL entry with extensions.
      *
      * @param userCertificateSerial serial number of revoked certificate.

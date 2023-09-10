@@ -85,7 +85,11 @@ private fun addEntries(builder: V2CRLBuilder, entries: List<CRLEntryBlock>)
                 extBuilder.addExtension(ext.extnId, ext.isCritical, ext.parsedValue)
             }
         }
-        builder.addCRLEntry(e.getSerial(), e.revocationDate, extBuilder.build())
+        if (extBuilder.isEmpty()) {
+            builder.addCRLEntry(e.getSerial(), e.revocationDate)
+        } else {
+            builder.addCRLEntry(e.getSerial(), e.revocationDate, extBuilder.build())
+        }
     }
 }
 

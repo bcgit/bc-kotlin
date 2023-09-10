@@ -70,6 +70,10 @@ class ExtensionsBuilder
         return this
     }
 
+    fun isEmpty(): Boolean {
+        return extGen.isEmpty
+    }
+
     /**
      * Build the final Extensions structure.
      *

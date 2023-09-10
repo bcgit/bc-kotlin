@@ -3,7 +3,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.DERPrintableString
 import org.bouncycastle.asn1.DERSequence
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
-import org.bouncycastle.asn1.util.ASN1Dump
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.*
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.io.FileOutputStream
 import java.math.BigInteger
 import java.util.*
 import kotlin.experimental.xor
@@ -159,18 +157,22 @@ class CertTest {
         assertEquals(left.serialNumber, right.serialNumber)
         assertEquals(left.revocationDate, right.revocationDate)
         assertEquals(left.hasExtensions, right.hasExtensions)
-        assertArrayEquals(left.extensions.encoded, right.extensions.encoded)
-
-
+        if (left.extensions != null && right.extensions != null) {
+            assertArrayEquals(left.extensions.encoded, right.extensions.encoded)
+        } else {
+            assertEquals(left.extensions, right.extensions)
+        }
 
         left = crl.findEntryForRevokedCertificate(cert.serialNumber)!!
         right = resCRL.findEntryForRevokedCertificate(cert.serialNumber)!!
         assertEquals(left.serialNumber, right.serialNumber)
         assertEquals(left.revocationDate, right.revocationDate)
         assertEquals(left.hasExtensions, right.hasExtensions)
-        assertArrayEquals(left.extensions.encoded, right.extensions.encoded)
-
-
+        if (left.extensions != null && right.extensions != null) {
+            assertArrayEquals(left.extensions.encoded, right.extensions.encoded)
+        } else {
+            assertEquals(left.extensions, right.extensions)
+        }
     }
 
 
