@@ -16,7 +16,7 @@ fun main() {
 
     var kp = signingKeyPair {
         sphincsPlus {
-            parameterSet = "shake-256f-robust"
+            parameterSet = "sha2-256f"
         }
     }
 

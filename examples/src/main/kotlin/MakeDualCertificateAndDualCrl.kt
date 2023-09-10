@@ -104,6 +104,7 @@ fun main() {
     }
 
     println("cert verifies " + cert.signatureVerifiedBy(cert))
+    println("cert alt verifies " + cert.alternativeSignatureVerifiedBy(altKp.verificationKey))
     println("crl verifies " + crl.signatureVerifiedBy(cert))
 
     var encKey = encryptedPrivateKey {
