@@ -11,7 +11,7 @@ import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.pqc.jcajce.interfaces.SPHINCSPlusKey
 
 // these are only in 1.0.2
-val sphincsPlus = BCObjectIdentifiers.sphincsPlus
+val sphincsPlus = BCObjectIdentifiers.sphincsPlus_interop
 
 class SPHINCSPlusSigSpec: SigAlgSpec {
 
@@ -63,6 +63,32 @@ class SPHINCSPlusSigSpec: SigAlgSpec {
     }
 
     private fun getSphincsPlusOID(name: String): ASN1ObjectIdentifier {
-        return BCObjectIdentifiers.sphincsPlus
+        if (name.equals("shake-128f-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_shake_128f
+        } else if (name.equals("shake-128s-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_shake_128s
+        } else if (name.equals("shake-192f-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_shake_192f
+        } else if (name.equals("shake-192s-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_shake_192s
+        } else if (name.equals("shake-256f-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_shake_256f
+        } else if (name.equals("shake-256s-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_shake_256s
+        } else if (name.equals("sha2-128f-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_sha2_128f
+        } else if (name.equals("sha2-128s-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_sha2_128s
+        } else if (name.equals("sha2-192f-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_sha2_192f
+        } else if (name.equals("sha2-192s-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_sha2_192s
+        } else if (name.equals("sha2-256f-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_sha2_256f
+        } else if (name.equals("sha2-256s-simple")) {
+            return BCObjectIdentifiers.sphincsPlus_sha2_256s
+        } else {
+            throw IllegalArgumentException("unknown parameter set: " + name)
+        }
     }
 }

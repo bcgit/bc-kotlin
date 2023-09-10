@@ -35,7 +35,7 @@ class SphincsPlusTest {
 
         var kp = signingKeyPair {
             sphincsPlus {
-                parameterSet = "sha2-128f-robust"
+                parameterSet = "sha2-128f"
             }
         }
 
@@ -92,7 +92,7 @@ class SphincsPlusTest {
 
         var kp = signingKeyPair {
             sphincsPlus {
-                parameterSet = "shake-128f-robust"
+                parameterSet = "shake-128f"
             }
         }
 

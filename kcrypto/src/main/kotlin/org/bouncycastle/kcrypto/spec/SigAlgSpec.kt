@@ -2,7 +2,6 @@ package org.bouncycastle.kcrypto.spec
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.bc.BCObjectIdentifiers
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
@@ -49,7 +48,18 @@ interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
                 dilithium2 -> DilithiumSigSpec(algId)
                 dilithium3 -> DilithiumSigSpec(algId)
                 dilithium5 -> DilithiumSigSpec(algId)
-                sphincsPlus -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_sha2_128f -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_sha2_128s -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_sha2_192f -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_sha2_192s -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_sha2_256f -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_sha2_256s -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_shake_128f -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_shake_128s -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_shake_192f -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_shake_192s -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_shake_256f -> SPHINCSPlusSigSpec(algId)
+                BCObjectIdentifiers.sphincsPlus_shake_256s -> SPHINCSPlusSigSpec(algId)
                 // SM3withSM2
                 ASN1ObjectIdentifier("1.2.156.10197.1.501") -> SM2SigSpec(Digest.SM3, id, algId)
                 else -> throw IllegalArgumentException("unknown algorithm: " + algId.algorithm)
