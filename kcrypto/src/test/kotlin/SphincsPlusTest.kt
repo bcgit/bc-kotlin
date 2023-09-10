@@ -1,20 +1,15 @@
-import org.bouncycastle.kcrypto.Digest
-import org.bouncycastle.kcrypto.dsl.edDsa
-import org.bouncycastle.kcrypto.dsl.falcon
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.sphincsPlus
-import org.bouncycastle.kcrypto.spec.asymmetric.*
+import org.bouncycastle.kcrypto.spec.asymmetric.FalconSigSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.SPHINCSPlusGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.SPHINCSPlusSigSpec
 import org.bouncycastle.util.Strings
-import org.bouncycastle.util.encoders.Base64
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.security.KeyFactory
-import java.security.PrivateKey
-import java.security.PublicKey
 import java.security.Signature
-import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import kotlin.experimental.xor
 
@@ -86,7 +81,7 @@ class SphincsPlusTest {
 
 
     @Test
-    fun `sphincsPlus shake-128f-robust`() {
+    fun `sphincsPlus shake-128f`() {
 
         val msg = Strings.toByteArray("Hello World!")
 
