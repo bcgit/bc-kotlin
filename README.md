@@ -21,7 +21,7 @@ To build put desired versions of BC jars in the directory bc-jars-reg and build 
 
 > gradle build
 
-BC version 1.73 or later is required to build due to PQC support. 
+BC version 1.77b09 or later is required to build due to PQC support. Beta versions (those with a b in them) can be found at https://www.bouncycastle.org/betas
 
 ## Running
 
