@@ -12,6 +12,7 @@ import org.bouncycastle.kcrypto.cmp.ProtectedPKIMessage
 import org.bouncycastle.kcrypto.cms.CertificateManagementMessage
 import org.bouncycastle.kcrypto.cms.SignedData
 import org.bouncycastle.kcrypto.crmf.CertificateRequest
+import org.bouncycastle.kcrypto.dsl.WrappedKeyStore
 import org.bouncycastle.kcrypto.pkcs.PKCS10Request
 import org.bouncycastle.kcrypto.pkcs.PKCS8EncryptedPrivateKey
 import org.bouncycastle.openssl.MiscPEMGenerator
@@ -45,6 +46,7 @@ fun OutputStreamWriter.writePEMObject(obj: Encodable) {
         is CertificateManagementMessage -> pw.writeObject(PemObject("PKCS7", obj.encoding))
         is SignedData -> pw.writeObject(PemObject("PKCS7", obj.encoding))
         is CRL -> pw.writeObject(MiscPEMGenerator(X509CRLHolder(obj.encoding)))
+        is WrappedKeyStore -> pw.writeObject(PemObject("PKCS12", obj.encoding))
         else -> throw IllegalArgumentException("unknown object passed for PEM encoding")
     }
 

@@ -4,7 +4,7 @@ import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.keyStore
+import org.bouncycastle.kcrypto.dsl.pkcs12KeyStore
 import org.bouncycastle.kcrypto.dsl.signingKey
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.dsl.verificationKey
@@ -20,19 +20,17 @@ fun main() {
     using(findBCProvider())
 
     var signingKey = signingKey {
-        keyStore {
+        pkcs12KeyStore {
             storeName = "examples/data/id.p12"
             storePassword = "password".toCharArray()
-            storeType = "PKCS12"
         }
         alias = "rsakey"
     }
 
     var verificationKey = verificationKey {
-        keyStore {
+        pkcs12KeyStore {
             storeName = "examples/data/id.p12"
             storePassword = "password".toCharArray()
-            storeType = "PKCS12"
         }
         alias = "rsakey"
     }
