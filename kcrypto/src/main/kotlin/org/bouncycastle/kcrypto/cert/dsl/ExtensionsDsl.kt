@@ -164,9 +164,7 @@ fun ExtensionsBody.deltaCertificateDescriptorExtension(block: ExtDeltaCertificat
     var ea = ExtDeltaCertificateDescriptor().apply(block)
     var e = Ext(ea.isCritical)
 
-    var deltaExt = DeltaCertificateTool.makeDeltaCertificateExtension(ea.isCritical,
-        DeltaCertificateTool.signature + DeltaCertificateTool.subject
-        + DeltaCertificateTool.extensions + DeltaCertificateTool.signature, ea.deltaCert._cert)
+    var deltaExt = DeltaCertificateTool.makeDeltaCertificateExtension(ea.isCritical, ea.deltaCert._cert)
     
     e.extOid = deltaExt.extnId
     e.extValue = deltaExt.parsedValue
