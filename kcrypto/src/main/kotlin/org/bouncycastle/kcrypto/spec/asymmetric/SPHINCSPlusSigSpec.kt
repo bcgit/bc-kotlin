@@ -63,29 +63,29 @@ class SPHINCSPlusSigSpec: SigAlgSpec {
     }
 
     private fun getSphincsPlusOID(name: String): ASN1ObjectIdentifier {
-        if (name.equals("shake-128f-simple")) {
+        if (name.equals("shake-128f")) {
             return BCObjectIdentifiers.sphincsPlus_shake_128f
-        } else if (name.equals("shake-128s-simple")) {
+        } else if (name.equals("shake-128s")) {
             return BCObjectIdentifiers.sphincsPlus_shake_128s
-        } else if (name.equals("shake-192f-simple")) {
+        } else if (name.equals("shake-192f")) {
             return BCObjectIdentifiers.sphincsPlus_shake_192f
-        } else if (name.equals("shake-192s-simple")) {
+        } else if (name.equals("shake-192s")) {
             return BCObjectIdentifiers.sphincsPlus_shake_192s
-        } else if (name.equals("shake-256f-simple")) {
+        } else if (name.equals("shake-256f")) {
             return BCObjectIdentifiers.sphincsPlus_shake_256f
-        } else if (name.equals("shake-256s-simple")) {
+        } else if (name.equals("shake-256s")) {
             return BCObjectIdentifiers.sphincsPlus_shake_256s
-        } else if (name.equals("sha2-128f-simple")) {
+        } else if (name.equals("sha2-128f")) {
             return BCObjectIdentifiers.sphincsPlus_sha2_128f
-        } else if (name.equals("sha2-128s-simple")) {
+        } else if (name.equals("sha2-128s")) {
             return BCObjectIdentifiers.sphincsPlus_sha2_128s
-        } else if (name.equals("sha2-192f-simple")) {
+        } else if (name.equals("sha2-192f")) {
             return BCObjectIdentifiers.sphincsPlus_sha2_192f
-        } else if (name.equals("sha2-192s-simple")) {
+        } else if (name.equals("sha2-192s")) {
             return BCObjectIdentifiers.sphincsPlus_sha2_192s
-        } else if (name.equals("sha2-256f-simple")) {
+        } else if (name.equals("sha2-256f")) {
             return BCObjectIdentifiers.sphincsPlus_sha2_256f
-        } else if (name.equals("sha2-256s-simple")) {
+        } else if (name.equals("sha2-256s")) {
             return BCObjectIdentifiers.sphincsPlus_sha2_256s
         } else {
             throw IllegalArgumentException("unknown parameter set: " + name)
