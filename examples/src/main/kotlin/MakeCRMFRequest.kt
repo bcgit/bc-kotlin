@@ -24,7 +24,7 @@ fun main() {
     }
 
     var sigKp = signingKeyPair {
-        dilithium {
+        mlDsa {
             parameterSet = "dilithium2"
         }
     }
@@ -61,8 +61,8 @@ fun main() {
         }
     }
 
-    val sender = GeneralName(X500Name("CN=Kyber Subject"))
-    val recipient = GeneralName(X500Name("CN=Dilithium Issuer"))
+    val sender = GeneralName(X500Name("CN=MLKEM Subject"))
+    val recipient = GeneralName(X500Name("CN=MLDSA Issuer"))
 
     var macMessage = protectedPkiMessage {
         this.sender = sender
@@ -89,7 +89,7 @@ fun main() {
         }
 
         signature {
-            Dilithium using sigKp.signingKey
+            MLDSA using sigKp.signingKey
         }
     }
 

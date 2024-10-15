@@ -83,22 +83,22 @@ class FalconSigType: NoDigSigType
 }
 
 /**
- * DSL for Dilithium signature type.
+ * DSL for MLDSA signature type.
  */
-class DilithiumSigType: NoDigSigType
+class MLDSASigType: NoDigSigType
 {
     override fun getSigAlgSpec(): SigAlgSpec {
-        return DilithiumSigSpec()
+        return MLDSASigSpec()
     }
 }
 
 /**
  * DSL for SPHINCS+ signature type.
  */
-class SphincsPlusSigType: NoDigSigType
+class SLHDSASigType: NoDigSigType
 {
     override fun getSigAlgSpec(): SigAlgSpec {
-        return SPHINCSPlusSigSpec()
+        return SLHDSASigSpec()
     }
 }
 
@@ -133,8 +133,8 @@ class SignatureBlock
     val EdDSA = SignatureDetails(this, EdDSASigType())
     val SM2 = SignatureDetails(this, SM2SigType())
     val Falcon = SignatureDetails(this, FalconSigType())
-    val Dilithium = SignatureDetails(this, DilithiumSigType())
-    val SPHINCSPlus = SignatureDetails(this, SphincsPlusSigType())
+    val MLDSA = SignatureDetails(this, MLDSASigType())
+    val SLHDSA = SignatureDetails(this, SLHDSASigType())
     val LMS = SignatureDetails(this, LMSSigType())
 
     val sha224 = Digest.SHA224

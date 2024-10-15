@@ -7,14 +7,14 @@ import org.bouncycastle.kcrypto.spec.SignPairGenSpec
 import org.bouncycastle.kcrypto.spec.VerifyGenSpec
 import java.security.SecureRandom
 
-class DilithiumGenSpec(val parameterSet: String, override val random: SecureRandom): SignPairGenSpec {
+class MLDSAGenSpec(val parameterSet: String, override val random: SecureRandom): SignPairGenSpec {
     constructor(parameterSet: String) : this(parameterSet, KCryptoServices.secureRandom)
 
-    override val signType get() = DilithiumGenSpec.signType
-    override val verifyType get() = DilithiumGenSpec.verifyType
+    override val signType get() = MLDSAGenSpec.signType
+    override val verifyType get() = MLDSAGenSpec.verifyType
 
     companion object: SignGenSpec, VerifyGenSpec {
-        override val signType = KeyType.SIGNING.forAlgorithm("Dilithium")
-        override val verifyType = KeyType.VERIFICATION.forAlgorithm("Dilithium")
+        override val signType = KeyType.SIGNING.forAlgorithm("MLDSA")
+        override val verifyType = KeyType.VERIFICATION.forAlgorithm("MLDSA")
     }
 }

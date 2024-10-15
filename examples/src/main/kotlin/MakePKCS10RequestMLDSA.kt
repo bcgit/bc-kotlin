@@ -4,12 +4,14 @@ import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.*
+import org.bouncycastle.kcrypto.dsl.mlDsa
+import org.bouncycastle.kcrypto.dsl.signingKeyPair
+import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.attribute
 import org.bouncycastle.kcrypto.pkcs.dsl.attributes
 import org.bouncycastle.kcrypto.pkcs.dsl.pkcs10Request
-import org.bouncycastle.kutil.writePEMObject
 import org.bouncycastle.kutil.findBCProvider
+import org.bouncycastle.kutil.writePEMObject
 import java.io.OutputStreamWriter
 
 fun main() {
@@ -17,8 +19,8 @@ fun main() {
     using(findBCProvider())
 
     var kp = signingKeyPair {
-        dilithium {
-            parameterSet = "dilithium2"
+        mlDsa {
+            parameterSet = "ml-dsa-44"
         }
     }
 
@@ -54,7 +56,7 @@ fun main() {
              }
         }
         signature {
-            Dilithium using kp.signingKey
+            MLDSA using kp.signingKey
         }
     }
 

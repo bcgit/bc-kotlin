@@ -1,6 +1,10 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
-import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.*
+import org.bouncycastle.kcrypto.cert.dsl.certificate
+import org.bouncycastle.kcrypto.cert.dsl.rdn
+import org.bouncycastle.kcrypto.cert.dsl.x500Name
+import org.bouncycastle.kcrypto.dsl.mlDsa
+import org.bouncycastle.kcrypto.dsl.signingKeyPair
+import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
@@ -12,15 +16,9 @@ fun main() {
 
     using(findBCProvider())
 
-    var sigKp = signingKeyPair {
-        dilithium {
-            parameterSet = "dilithium2"
-        }
-    }
-
-    var encKp = encryptingKeyPair {
-        ntru {
-            parameterSet = "ntruhrss701"
+    var kp = signingKeyPair {
+        mlDsa {
+            parameterSet = "ml-dsa-44"
         }
     }
 
@@ -39,23 +37,17 @@ fun main() {
         issuer = name
         notAfter = expDate
         subject = name
-        subjectPublicKey = sigKp.verificationKey
+        subjectPublicKey = kp.verificationKey
 
-        extensions = extensions {
-            subjectAltPublicKeyInfoExtension {
-                publicKey = encKp.encryptionKey
-            }
-        }
-        
         signature {
-            Dilithium using sigKp.signingKey
+            MLDSA using kp.signingKey
         }
     }
 
     println("cert verifies " + cert.signatureVerifiedBy(cert))
 
     var encKey = encryptedPrivateKey {
-        privateKey = sigKp.signingKey
+        privateKey = kp.signingKey
         encryption {
             AESKWP using SCRYPT {
                 saltLength = 20

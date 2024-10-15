@@ -1,14 +1,10 @@
 package org.bouncycastle.kcrypto
 
-import KCryptoServices.Companion.helper
 import KCryptoServices.Companion.helperFor
-import KCryptoServices.Companion.pqcHelper
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
-import org.bouncycastle.kcrypto.dsl.signingKey
 import org.bouncycastle.kcrypto.spec.SigAlgSpec
 import org.bouncycastle.kcrypto.spec.asymmetric.*
 import org.bouncycastle.pqc.jcajce.interfaces.LMSPrivateKey
-import org.bouncycastle.util.Strings
 import java.io.OutputStream
 import java.security.PrivateKey
 import java.security.Signature
@@ -43,11 +39,11 @@ internal class BaseSigner(sigSpec: SigAlgSpec, signingKey: BaseSigningKey) : Sig
             is FalconSigSpec -> {
                 simplify("Falcon")
             }
-            is DilithiumSigSpec -> {
-                simplify("Dilithium")
+            is MLDSASigSpec -> {
+                simplify("MLDSA")
             }
-            is SPHINCSPlusSigSpec -> {
-                simplify("SPHINCSPlus")
+            is SLHDSASigSpec -> {
+                simplify("SLHDSA")
             }
             else ->
                 throw IllegalArgumentException("unknown SigAlgSpec")

@@ -2,7 +2,9 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.kcrypto.cert.dsl.certificate
 import org.bouncycastle.kcrypto.cert.dsl.rdn
 import org.bouncycastle.kcrypto.cert.dsl.x500Name
-import org.bouncycastle.kcrypto.dsl.*
+import org.bouncycastle.kcrypto.dsl.signingKeyPair
+import org.bouncycastle.kcrypto.dsl.slhDsa
+import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
@@ -15,8 +17,8 @@ fun main() {
     using(findBCProvider())
 
     var kp = signingKeyPair {
-        dilithium {
-            parameterSet = "dilithium2"
+        slhDsa {
+            parameterSet = "slh-dsa-sha2-128f"
         }
     }
 
@@ -38,7 +40,7 @@ fun main() {
         subjectPublicKey = kp.verificationKey
 
         signature {
-            Dilithium using kp.signingKey
+            SLHDSA using kp.signingKey
         }
     }
 

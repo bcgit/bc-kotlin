@@ -99,20 +99,20 @@ fun SigningKeyBuilder.falcon(block: FalconParams.() -> Unit) {
  * Initialize an Falcon Key pair
  * @param block initialization block.
  */
-fun SigningKeyBuilder.dilithium(block: DilithiumParams.() -> Unit) {
-    val p = DilithiumParams().apply(block)
+fun SigningKeyBuilder.mlDsa(block: MLDSAParams.() -> Unit) {
+    val p = MLDSAParams().apply(block)
 
-    setSpec(DilithiumGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+    setSpec(MLDSAGenSpec(p.parameterSet, KCryptoServices.secureRandom))
 }
 
 /**
  * Initialize an sphincs+ Key pair
  * @param block initialization block.
  */
-fun SigningKeyBuilder.sphincsPlus(block: SPHINCSPlusParams.() -> Unit) {
-    val p = SPHINCSPlusParams().apply(block)
+fun SigningKeyBuilder.slhDsa(block: SLHDSAParams.() -> Unit) {
+    val p = SLHDSAParams().apply(block)
 
-    setSpec(SPHINCSPlusGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+    setSpec(SLHDSAGenSpec(p.parameterSet, KCryptoServices.secureRandom))
 }
 
 /**
@@ -154,13 +154,13 @@ fun EncryptingKeyBuilder.rsa(block: RsaParams.() -> Unit) {
 }
 
 /**
- * Initialize a Kyber key pair.
+ * Initialize a MLKEM key pair.
  * @param block initialization block
  */
-fun EncryptingKeyBuilder.kyber(block: KyberParams.() -> Unit) {
-    val p = KyberParams().apply(block)
+fun EncryptingKeyBuilder.kyber(block: MLKEMParams.() -> Unit) {
+    val p = MLKEMParams().apply(block)
 
-    setSpec(KyberGenSpec(p.paramSet, KCryptoServices.secureRandom))
+    setSpec(MLKEMGenSpec(p.paramSet, KCryptoServices.secureRandom))
 }
 
 /**
@@ -184,9 +184,9 @@ data class RsaParams(
 }
 
 /**
- * Kyber Parameters
+ * MLKEM Parameters
  */
-data class KyberParams(var paramSet: String = "kyber512")
+data class MLKEMParams(var paramSet: String = "kyber512")
 
 /**
  * NTRU Parameters
@@ -214,14 +214,14 @@ data class EdDsaParams(var curveName: String = "ED25519")
 data class FalconParams(var parameterSet: String = "falcon-512")
 
 /**
- * Dilithium Parameters
+ * MLDSA Parameters
  */
-data class DilithiumParams(var parameterSet: String = "dilithium5")
+data class MLDSAParams(var parameterSet: String = "dilithium5")
 
 /**
  * SphincsPlus Parameters
  */
-data class SPHINCSPlusParams(var parameterSet: String = "shake_128f")
+data class SLHDSAParams(var parameterSet: String = "shake_128f")
 
 /**
  * LMS Parameters

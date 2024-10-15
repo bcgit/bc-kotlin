@@ -1,7 +1,7 @@
-import org.bouncycastle.kcrypto.dsl.dilithium
+import org.bouncycastle.kcrypto.dsl.mlDsa
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
-import org.bouncycastle.kcrypto.spec.asymmetric.DilithiumGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.DilithiumSigSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.MLDSAGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.MLDSASigSpec
 import org.bouncycastle.util.Strings
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -13,11 +13,11 @@ import java.security.spec.X509EncodedKeySpec
 import kotlin.experimental.xor
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DilithiumTest {
+class MLDSATest {
 
     init {
         initProvider()
-        val fact = KeyFactory.getInstance("Dilithium", "BCPQC")
+        val fact = KeyFactory.getInstance("MLDSA", "BC")
     }
 
     val input = byteArrayOf(
@@ -33,17 +33,17 @@ class DilithiumTest {
 
 
     @Test
-    fun `dilithium dilithium2`() {
+    fun `mlDsa ml-dsa-44`() {
 
         val msg = Strings.toByteArray("Hello World!")
 
         var kp = signingKeyPair {
-            dilithium {
-                parameterSet = "dilithium2"
+            mlDsa {
+                parameterSet = "ml-dsa-44"
             }
         }
 
-        val sigCalc = kp.signingKey.signatureCalculator(DilithiumSigSpec())
+        val sigCalc = kp.signingKey.signatureCalculator(MLDSASigSpec())
 
         sigCalc.use {
             it.stream.write(msg)
@@ -52,7 +52,7 @@ class DilithiumTest {
         val sig = sigCalc.signature()
 
 
-        val sigVer = kp.verificationKey.signatureVerifier(DilithiumSigSpec())
+        val sigVer = kp.verificationKey.signatureVerifier(MLDSASigSpec())
 
         sigVer.use {
             it.stream.write(msg)
@@ -60,10 +60,10 @@ class DilithiumTest {
 
         assertTrue(sigVer.verifies(sig))
 
-        val fact = KeyFactory.getInstance("Dilithium", "BCPQC")
+        val fact = KeyFactory.getInstance("MLDSA", "BC")
         val pubKey = fact.generatePublic(X509EncodedKeySpec(kp.verificationKey.encoding))
 
-        val s = Signature.getInstance("Dilithium", "BCPQC")
+        val s = Signature.getInstance("MLDSA", "BC")
 
         s.initVerify(pubKey)
 
@@ -75,8 +75,8 @@ class DilithiumTest {
 
         try {
             val sigVer2 = KCryptoServices
-                .verificationKey(pubKey.encoded, DilithiumGenSpec.verifyType)
-                .signatureVerifier(DilithiumSigSpec())
+                .verificationKey(pubKey.encoded, MLDSAGenSpec.verifyType)
+                .signatureVerifier(MLDSASigSpec())
 
             sigVer2.use {
                 it.stream.write(msg)
@@ -89,17 +89,17 @@ class DilithiumTest {
     }
 
     @Test
-    fun `dilithium dilithium3`() {
+    fun `mlDsa ml-dsa-65`() {
 
         val msg = Strings.toByteArray("Hello World!")
 
         var kp = signingKeyPair {
-            dilithium {
-                parameterSet = "dilithium3"
+            mlDsa {
+                parameterSet = "ml-dsa-65"
             }
         }
 
-        val sigCalc = kp.signingKey.signatureCalculator(DilithiumSigSpec())
+        val sigCalc = kp.signingKey.signatureCalculator(MLDSASigSpec())
 
         sigCalc.use {
             it.stream.write(msg)
@@ -108,7 +108,7 @@ class DilithiumTest {
         val sig = sigCalc.signature()
 
 
-        val sigVer = kp.verificationKey.signatureVerifier(DilithiumSigSpec())
+        val sigVer = kp.verificationKey.signatureVerifier(MLDSASigSpec())
 
         sigVer.use {
             it.stream.write(msg)
@@ -116,10 +116,10 @@ class DilithiumTest {
 
         assertTrue(sigVer.verifies(sig))
 
-        val fact = KeyFactory.getInstance("Dilithium", "BCPQC")
+        val fact = KeyFactory.getInstance("MLDSA", "BC")
         val pubKey = fact.generatePublic(X509EncodedKeySpec(kp.verificationKey.encoding))
 
-        val s = Signature.getInstance("Dilithium", "BCPQC")
+        val s = Signature.getInstance("MLDSA", "BC")
 
         s.initVerify(pubKey)
 
@@ -131,8 +131,8 @@ class DilithiumTest {
 
         try {
             val sigVer2 = KCryptoServices
-                .verificationKey(pubKey.encoded, DilithiumGenSpec.verifyType)
-                .signatureVerifier(DilithiumSigSpec())
+                .verificationKey(pubKey.encoded, MLDSAGenSpec.verifyType)
+                .signatureVerifier(MLDSASigSpec())
 
             sigVer2.use {
                 it.stream.write(msg)
@@ -146,17 +146,17 @@ class DilithiumTest {
     }
 
     @Test
-    fun `dilithium dilithium5`() {
+    fun `mlDsa ml-dsa-87`() {
 
         val msg = Strings.toByteArray("Hello World!")
 
         var kp = signingKeyPair {
-            dilithium {
-                parameterSet = "dilithium5"
+            mlDsa {
+                parameterSet = "ml-dsa-87"
             }
         }
 
-        val sigCalc = kp.signingKey.signatureCalculator(DilithiumSigSpec())
+        val sigCalc = kp.signingKey.signatureCalculator(MLDSASigSpec())
 
         sigCalc.use {
             it.stream.write(msg)
@@ -165,7 +165,7 @@ class DilithiumTest {
         val sig = sigCalc.signature()
 
 
-        val sigVer = kp.verificationKey.signatureVerifier(DilithiumSigSpec())
+        val sigVer = kp.verificationKey.signatureVerifier(MLDSASigSpec())
 
         sigVer.use {
             it.stream.write(msg)
@@ -173,10 +173,10 @@ class DilithiumTest {
 
         assertTrue(sigVer.verifies(sig))
 
-        val fact = KeyFactory.getInstance("Dilithium", "BCPQC")
+        val fact = KeyFactory.getInstance("MLDSA", "BC")
         val pubKey = fact.generatePublic(X509EncodedKeySpec(kp.verificationKey.encoding))
 
-        val s = Signature.getInstance("Dilithium", "BCPQC")
+        val s = Signature.getInstance("MLDSA", "BC")
 
         s.initVerify(pubKey)
 
@@ -188,8 +188,8 @@ class DilithiumTest {
 
         try {
             val sigVer2 = KCryptoServices
-                .verificationKey(pubKey.encoded, DilithiumGenSpec.verifyType)
-                .signatureVerifier(DilithiumSigSpec())
+                .verificationKey(pubKey.encoded, MLDSAGenSpec.verifyType)
+                .signatureVerifier(MLDSASigSpec())
 
             sigVer2.use {
                 it.stream.write(msg)

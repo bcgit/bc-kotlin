@@ -1,7 +1,7 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.dilithium
 import org.bouncycastle.kcrypto.dsl.edDsa
+import org.bouncycastle.kcrypto.dsl.mlDsa
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
@@ -22,8 +22,8 @@ fun main() {
     }
 
     var altKp = signingKeyPair {
-        dilithium {
-            parameterSet = "Dilithium2"
+        mlDsa {
+            parameterSet = "MLDSA2"
         }
     }
 
@@ -54,7 +54,7 @@ fun main() {
             EdDSA using kp.signingKey
         }
         altSignature {
-            Dilithium using altKp.signingKey
+            MLDSA using altKp.signingKey
         }
     }
 
@@ -83,7 +83,7 @@ fun main() {
             EdDSA using kp.signingKey
         }
         altSignature {
-            Dilithium using altKp.signingKey
+            MLDSA using altKp.signingKey
         }
     }
 
@@ -99,7 +99,7 @@ fun main() {
             EdDSA using kp.signingKey
         }
         altSignature {
-            Dilithium using altKp.signingKey
+            MLDSA using altKp.signingKey
         }
     }
 

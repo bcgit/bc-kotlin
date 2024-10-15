@@ -7,14 +7,14 @@ import org.bouncycastle.kcrypto.spec.SignPairGenSpec
 import org.bouncycastle.kcrypto.spec.VerifyGenSpec
 import java.security.SecureRandom
 
-class SPHINCSPlusGenSpec(val parameterSet: String, override val random: SecureRandom): SignPairGenSpec {
+class SLHDSAGenSpec(val parameterSet: String, override val random: SecureRandom): SignPairGenSpec {
     constructor(parameterSet: String) : this(parameterSet, KCryptoServices.secureRandom)
 
-    override val signType get() = SPHINCSPlusGenSpec.signType
-    override val verifyType get() = SPHINCSPlusGenSpec.verifyType
+    override val signType get() = SLHDSAGenSpec.signType
+    override val verifyType get() = SLHDSAGenSpec.verifyType
 
     companion object: SignGenSpec, VerifyGenSpec {
-        override val signType = KeyType.SIGNING.forAlgorithm("SPHINCSPlus")
-        override val verifyType = KeyType.VERIFICATION.forAlgorithm("SPHINCSPlus")
+        override val signType = KeyType.SIGNING.forAlgorithm("SLHDSA")
+        override val verifyType = KeyType.VERIFICATION.forAlgorithm("SLHDSA")
     }
 }

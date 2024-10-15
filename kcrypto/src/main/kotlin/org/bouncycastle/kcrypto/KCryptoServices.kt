@@ -2,6 +2,7 @@ import org.bouncycastle.asn1.bc.BCObjectIdentifiers
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
+import org.bouncycastle.jcajce.spec.*
 import org.bouncycastle.jcajce.util.DefaultJcaJceHelper
 import org.bouncycastle.jcajce.util.JcaJceHelper
 import org.bouncycastle.jcajce.util.ProviderJcaJceHelper
@@ -13,7 +14,9 @@ import org.bouncycastle.kcrypto.spec.asymmetric.*
 import org.bouncycastle.kcrypto.spec.kdf.PBKDF2Spec
 import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.*
-import org.bouncycastle.pqc.jcajce.spec.*
+import org.bouncycastle.pqc.jcajce.spec.FalconParameterSpec
+import org.bouncycastle.pqc.jcajce.spec.LMSKeyGenParameterSpec
+import org.bouncycastle.pqc.jcajce.spec.NTRUParameterSpec
 import java.security.Provider
 import java.security.SecureRandom
 import java.security.Security
@@ -63,8 +66,8 @@ class KCryptoServices {
         internal fun isPQC(name: String): Boolean
         {
              return name.equals("FALCON", true) || name.startsWith("1.3.9999.3")
-                     || name.equals("SPHINCSPLUS", true) || name.equals("SPHINCS+", true) || name.startsWith(BCObjectIdentifiers.sphincsPlus.id)
-                     || name.equals("DILITHIUM", true) || name.startsWith("1.3.6.1.4.1.2.267.12")
+                     || name.startsWith(BCObjectIdentifiers.sphincsPlus.id)
+                     || name.startsWith("1.3.6.1.4.1.2.267.12")
         }
 
         internal fun helperFor(algorithm: String): JcaJceHelper
@@ -113,17 +116,17 @@ class KCryptoServices {
                     falconGen.initialize(falconSpec, keyGenSpec.random)
                     return SigningKeyPair(KeyPair(falconGen.genKeyPair()))
                 }
-                is DilithiumGenSpec -> {
-                    val dilithiumGen = _pqcHelper.createKeyPairGenerator("Dilithium")
-                    val dilithiumSpec = DilithiumParameterSpec.fromName(keyGenSpec.parameterSet)
-                    dilithiumGen.initialize(dilithiumSpec, keyGenSpec.random)
-                    return SigningKeyPair(KeyPair(dilithiumGen.genKeyPair()))
+                is MLDSAGenSpec -> {
+                    val mlDsaGen = _helper.createKeyPairGenerator("MLDSA")
+                    val mlDsaSpec = MLDSAParameterSpec.fromName(keyGenSpec.parameterSet)
+                    mlDsaGen.initialize(mlDsaSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(mlDsaGen.genKeyPair()))
                 }
-                is SPHINCSPlusGenSpec -> {
-                    val sphincsPlusGen = _pqcHelper.createKeyPairGenerator("SPHINCSPlus")
-                    val sphincsPlusSpec = SPHINCSPlusParameterSpec.fromName(keyGenSpec.parameterSet)
-                    sphincsPlusGen.initialize(sphincsPlusSpec, keyGenSpec.random)
-                    return SigningKeyPair(KeyPair(sphincsPlusGen.genKeyPair()))
+                is SLHDSAGenSpec -> {
+                    val slhdsaGen = _helper.createKeyPairGenerator("SLH-DSA")
+                    val slhdsaSpec = SLHDSAParameterSpec.fromName(keyGenSpec.parameterSet)
+                    slhdsaGen.initialize(slhdsaSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(slhdsaGen.genKeyPair()))
                 }
                 is LMSGenSpec -> {
                     val lmsGen = _pqcHelper.createKeyPairGenerator("LMS")
@@ -149,9 +152,9 @@ class KCryptoServices {
                 kpGen.initialize(RSAKeyGenParameterSpec(keySpec.keySize, keySpec.publicExponent), keySpec.random)
                 return EncryptingKeyPair(KeyPair(kpGen.generateKeyPair()));
             }
-            if (keySpec is KyberGenSpec) {
-                val kpGen = pqcHelper.createKeyPairGenerator("Kyber");
-                kpGen.initialize(KyberParameterSpec.fromName(keySpec.parameterSet), keySpec.random)
+            if (keySpec is MLKEMGenSpec) {
+                val kpGen = pqcHelper.createKeyPairGenerator("MLKEM");
+                kpGen.initialize(MLKEMParameterSpec.fromName(keySpec.parameterSet), keySpec.random)
                 return EncryptingKeyPair(KeyPair(kpGen.generateKeyPair()));
             }
             if (keySpec is NTRUGenSpec) {

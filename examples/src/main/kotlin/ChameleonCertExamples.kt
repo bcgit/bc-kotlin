@@ -2,8 +2,8 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.Digest
 import org.bouncycastle.kcrypto.cert.dsl.*
-import org.bouncycastle.kcrypto.dsl.dilithium
 import org.bouncycastle.kcrypto.dsl.ec
+import org.bouncycastle.kcrypto.dsl.mlDsa
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
 import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kutil.findBCProvider
@@ -79,20 +79,20 @@ fun main() {
         }
     }
 
-    var dilithiumRootKp = signingKeyPair {
-        dilithium {
-            parameterSet = "Dilithium3"
+    var mlDsaRootKp = signingKeyPair {
+        mlDsa {
+            parameterSet = "ml-dsa-65"
         }
     }
 
-    val dilithiumRootName = x500Name {
+    val mlDsaRootName = x500Name {
         rdn(BCStyle.C, "XX")
         rdn(BCStyle.O, "Royal Institute of Public Key Infrastructure")
         rdn(BCStyle.OU, "Post-Heffalump Research Department")
-        rdn(BCStyle.CN, "Dilithium Root - G1")
+        rdn(BCStyle.CN, "MLDSA Root - G1")
     }
 
-    var dilithiumRootCertExtensions = extensions {
+    var mlDsaRootCertExtensions = extensions {
         critical(basicConstraintsExtension {
             isCA = true
         })
@@ -100,35 +100,35 @@ fun main() {
             usage = KeyUsage.digitalSignature + KeyUsage.cRLSign + KeyUsage.keyCertSign
         })
         subjectKeyIdentifierExtension {
-            subjectKey = dilithiumRootKp.verificationKey
+            subjectKey = mlDsaRootKp.verificationKey
         }
         authorityKeyIdentifierExtension {
-            authorityKey = dilithiumRootKp.verificationKey
+            authorityKey = mlDsaRootKp.verificationKey
         }
         deltaCertificateDescriptorExtension {
             deltaCert = ecRootCert
         }
     }
 
-    var dilithiumRootCert = certificate {
-        issuer = dilithiumRootName
+    var mlDsaRootCert = certificate {
+        issuer = mlDsaRootName
 
         serialNumber = calcSerialNumber(1)
 
         notAfter = expDate
-        subject = dilithiumRootName
-        subjectPublicKey = dilithiumRootKp.verificationKey
+        subject = mlDsaRootName
+        subjectPublicKey = mlDsaRootKp.verificationKey
 
-        extensions = dilithiumRootCertExtensions
+        extensions = mlDsaRootCertExtensions
 
         signature {
-            Dilithium using dilithiumRootKp.signingKey
+            MLDSA using mlDsaRootKp.signingKey
         }
     }
     
-    var dilithiumEEKp = signingKeyPair {
-        dilithium {
-            parameterSet = "Dilithium3"
+    var mlDsaEEKp = signingKeyPair {
+        mlDsa {
+            parameterSet = "ml-dsa-65"
         }
     }
 
@@ -144,15 +144,15 @@ fun main() {
         rdn(BCStyle.GIVENNAME, "Hanako")
     }
 
-    var dilithiumEECert = certificate {
+    var mlDsaEECert = certificate {
 
         serialNumber = calcSerialNumber(2)
 
-        issuer = dilithiumRootCert
+        issuer = mlDsaRootCert
 
         notAfter = expDate
         subject = eeName
-        subjectPublicKey = dilithiumEEKp.verificationKey
+        subjectPublicKey = mlDsaEEKp.verificationKey
         extensions = extensions {
             critical(basicConstraintsExtension {
                 isCA = false
@@ -161,15 +161,15 @@ fun main() {
                 usage = KeyUsage.digitalSignature
             })
             subjectKeyIdentifierExtension {
-                subjectKey = dilithiumEEKp.verificationKey
+                subjectKey = mlDsaEEKp.verificationKey
             }
             authorityKeyIdentifierExtension {
-                authorityKey = dilithiumRootCert.subjectPublicKeyInfo
+                authorityKey = mlDsaRootCert.subjectPublicKeyInfo
             }
         }
 
         signature {
-            Dilithium using dilithiumRootKp.signingKey
+            MLDSA using mlDsaRootKp.signingKey
         }
     }
 
@@ -196,7 +196,7 @@ fun main() {
                 authorityKey = ecRootCert.subjectPublicKeyInfo
             }
             deltaCertificateDescriptorExtension {
-                deltaCert = dilithiumEECert
+                deltaCert = mlDsaEECert
             }
         }
 
@@ -209,13 +209,13 @@ fun main() {
 
     OutputStreamWriter(FileOutputStream("ee_ec_cert.pem")).writePEMObject(ecEECert)
 
-    OutputStreamWriter(FileOutputStream("ee_dil_priv.pem")).writePEMObject(dilithiumEEKp.signingKey)
+    OutputStreamWriter(FileOutputStream("ee_mldsa_priv.pem")).writePEMObject(mlDsaEEKp.signingKey)
 
-    OutputStreamWriter(FileOutputStream("ee_dil_cert.pem")).writePEMObject(dilithiumEECert)
+    OutputStreamWriter(FileOutputStream("ee_mldsa_cert.pem")).writePEMObject(mlDsaEECert)
 
     OutputStreamWriter(FileOutputStream("ta_ec_priv.pem")).writePEMObject(ecRootKp.signingKey)
 
     OutputStreamWriter(FileOutputStream("ta_ec_cert.pem")).writePEMObject(ecRootCert)
 
-    OutputStreamWriter(FileOutputStream("ta_dil_cert.pem")).writePEMObject(dilithiumRootCert)
+    OutputStreamWriter(FileOutputStream("ta_mldsa_cert.pem")).writePEMObject(mlDsaRootCert)
 }

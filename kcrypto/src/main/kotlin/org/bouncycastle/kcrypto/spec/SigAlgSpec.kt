@@ -15,8 +15,8 @@ import org.bouncycastle.kcrypto.spec.asymmetric.*
 // these are only in 1.0.2
 private val id_Ed25519 = ASN1ObjectIdentifier("1.3.101").branch("112").intern()
 private val id_Ed448 = ASN1ObjectIdentifier("1.3.101").branch("113").intern()
-private val falcon_512 = ASN1ObjectIdentifier("1.3.9999.3.1") // falcon.branch("1");
-private val falcon_1024 = ASN1ObjectIdentifier("1.3.9999.3.4") // falcon.branch("2");
+private val falcon_512 = BCObjectIdentifiers.falcon_512 // falcon.branch("1");
+private val falcon_1024 = BCObjectIdentifiers.falcon_1024 // falcon.branch("2");
 
 interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
     
@@ -45,21 +45,21 @@ interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
                 id_Ed448 -> EdDSASigSpec(algId)
                 falcon_512 -> FalconSigSpec(algId)
                 falcon_1024 -> FalconSigSpec(algId)
-                dilithium2 -> DilithiumSigSpec(algId)
-                dilithium3 -> DilithiumSigSpec(algId)
-                dilithium5 -> DilithiumSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_sha2_128f -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_sha2_128s -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_sha2_192f -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_sha2_192s -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_sha2_256f -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_sha2_256s -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_shake_128f -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_shake_128s -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_shake_192f -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_shake_192s -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_shake_256f -> SPHINCSPlusSigSpec(algId)
-                BCObjectIdentifiers.sphincsPlus_shake_256s -> SPHINCSPlusSigSpec(algId)
+                ml_dsa_44 -> MLDSASigSpec(algId)
+                ml_dsa_65 -> MLDSASigSpec(algId)
+                ml_dsa_87 -> MLDSASigSpec(algId)
+                slh_dsa_sha2_128f-> SLHDSASigSpec(algId)
+                slh_dsa_sha2_128s -> SLHDSASigSpec(algId)
+                slh_dsa_sha2_192f -> SLHDSASigSpec(algId)
+                slh_dsa_sha2_192s -> SLHDSASigSpec(algId)
+                slh_dsa_sha2_256f -> SLHDSASigSpec(algId)
+                slh_dsa_sha2_256s -> SLHDSASigSpec(algId)
+                slh_dsa_shake_128f-> SLHDSASigSpec(algId)
+                slh_dsa_shake_128s -> SLHDSASigSpec(algId)
+                slh_dsa_shake_192f -> SLHDSASigSpec(algId)
+                slh_dsa_shake_192s -> SLHDSASigSpec(algId)
+                slh_dsa_shake_256f -> SLHDSASigSpec(algId)
+                slh_dsa_shake_256s -> SLHDSASigSpec(algId)
                 // SM3withSM2
                 ASN1ObjectIdentifier("1.2.156.10197.1.501") -> SM2SigSpec(Digest.SM3, id, algId)
                 else -> throw IllegalArgumentException("unknown algorithm: " + algId.algorithm)

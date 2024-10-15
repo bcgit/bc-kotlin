@@ -1,8 +1,9 @@
 import org.bouncycastle.asn1.x500.style.BCStyle
-import org.bouncycastle.kcrypto.cert.dsl.certificate
-import org.bouncycastle.kcrypto.cert.dsl.rdn
-import org.bouncycastle.kcrypto.cert.dsl.x500Name
-import org.bouncycastle.kcrypto.dsl.*
+import org.bouncycastle.kcrypto.cert.dsl.*
+import org.bouncycastle.kcrypto.dsl.edDsa
+import org.bouncycastle.kcrypto.dsl.mlDsa
+import org.bouncycastle.kcrypto.dsl.signingKeyPair
+import org.bouncycastle.kcrypto.dsl.using
 import org.bouncycastle.kcrypto.pkcs.dsl.encryptedPrivateKey
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
@@ -15,8 +16,14 @@ fun main() {
     using(findBCProvider())
 
     var kp = signingKeyPair {
-        sphincsPlus {
-            parameterSet = "sha2-256f"
+        edDsa {
+            curveName = "Ed25519"
+        }
+    }
+
+    var altKp = signingKeyPair {
+        mlDsa {
+            parameterSet = "ML-DSA-44"
         }
     }
 
@@ -37,12 +44,22 @@ fun main() {
         subject = name
         subjectPublicKey = kp.verificationKey
 
+        extensions = extensions {
+            subjectAltPublicKeyInfoExtension {
+                publicKey = altKp.verificationKey
+            }
+        }
+        
         signature {
-            SPHINCSPlus using kp.signingKey
+            EdDSA using kp.signingKey
+        }
+        altSignature {
+            MLDSA using altKp.signingKey
         }
     }
 
     println("cert verifies " + cert.signatureVerifiedBy(cert))
+    println("cert alternative signature verifies " + cert.alternativeSignatureVerifiedBy(altKp.verificationKey))
 
     var encKey = encryptedPrivateKey {
         privateKey = kp.signingKey

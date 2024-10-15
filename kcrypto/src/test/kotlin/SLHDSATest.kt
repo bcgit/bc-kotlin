@@ -1,8 +1,8 @@
 import org.bouncycastle.kcrypto.dsl.signingKeyPair
-import org.bouncycastle.kcrypto.dsl.sphincsPlus
+import org.bouncycastle.kcrypto.dsl.slhDsa
 import org.bouncycastle.kcrypto.spec.asymmetric.FalconSigSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.SPHINCSPlusGenSpec
-import org.bouncycastle.kcrypto.spec.asymmetric.SPHINCSPlusSigSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.SLHDSAGenSpec
+import org.bouncycastle.kcrypto.spec.asymmetric.SLHDSASigSpec
 import org.bouncycastle.util.Strings
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -14,7 +14,7 @@ import java.security.spec.X509EncodedKeySpec
 import kotlin.experimental.xor
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SphincsPlusTest {
+class SLHDSATest {
 
     init {
         initProvider()
@@ -24,17 +24,17 @@ class SphincsPlusTest {
 
 
     @Test
-    fun `sphincsPlus sha2-128f`() {
+    fun `slhDsa sha2-128f`() {
 
         val msg = Strings.toByteArray("Hello World!")
 
         var kp = signingKeyPair {
-            sphincsPlus {
+            slhDsa {
                 parameterSet = "sha2-128f"
             }
         }
 
-        val sigCalc = kp.signingKey.signatureCalculator(SPHINCSPlusSigSpec())
+        val sigCalc = kp.signingKey.signatureCalculator(SLHDSASigSpec())
 
         sigCalc.use {
             it.stream.write(msg)
@@ -43,7 +43,7 @@ class SphincsPlusTest {
         val sig = sigCalc.signature()
 
 
-        val sigVer = kp.verificationKey.signatureVerifier(SPHINCSPlusSigSpec())
+        val sigVer = kp.verificationKey.signatureVerifier(SLHDSASigSpec())
 
         sigVer.use {
             it.stream.write(msg)
@@ -51,10 +51,10 @@ class SphincsPlusTest {
 
         assertTrue(sigVer.verifies(sig))
 
-        val fact = KeyFactory.getInstance("SPHINCSPlus", "BCPQC")
+        val fact = KeyFactory.getInstance("SLH-DSA", "BC")
         val pubKey = fact.generatePublic(X509EncodedKeySpec(kp.verificationKey.encoding))
 
-        val s = Signature.getInstance("SPHINCSPlus", "BCPQC")
+        val s = Signature.getInstance("SLH-DSA", "BC")
 
         s.initVerify(pubKey)
 
@@ -66,7 +66,7 @@ class SphincsPlusTest {
 
         try {
             val sigVer2 = KCryptoServices
-                    .verificationKey(pubKey.encoded, SPHINCSPlusGenSpec.verifyType)
+                    .verificationKey(pubKey.encoded, SLHDSAGenSpec.verifyType)
                     .signatureVerifier(FalconSigSpec())
 
             sigVer2.use {
@@ -81,17 +81,17 @@ class SphincsPlusTest {
 
 
     @Test
-    fun `sphincsPlus shake-128f`() {
+    fun `slhDsa shake-128f`() {
 
         val msg = Strings.toByteArray("Hello World!")
 
         var kp = signingKeyPair {
-            sphincsPlus {
+            slhDsa {
                 parameterSet = "shake-128f"
             }
         }
 
-        val sigCalc = kp.signingKey.signatureCalculator(SPHINCSPlusSigSpec())
+        val sigCalc = kp.signingKey.signatureCalculator(SLHDSASigSpec())
 
         sigCalc.use {
             it.stream.write(msg)
@@ -100,7 +100,7 @@ class SphincsPlusTest {
         val sig = sigCalc.signature()
 
 
-        val sigVer = kp.verificationKey.signatureVerifier(SPHINCSPlusSigSpec())
+        val sigVer = kp.verificationKey.signatureVerifier(SLHDSASigSpec())
 
         sigVer.use {
             it.stream.write(msg)
@@ -108,10 +108,10 @@ class SphincsPlusTest {
 
         assertTrue(sigVer.verifies(sig))
 
-        val fact = KeyFactory.getInstance("SPHINCSPlus", "BCPQC")
+        val fact = KeyFactory.getInstance("SLH-DSA", "BC")
         val pubKey = fact.generatePublic(X509EncodedKeySpec(kp.verificationKey.encoding))
 
-        val s = Signature.getInstance("SPHINCSPlus", "BCPQC")
+        val s = Signature.getInstance("SLH-DSA", "BC")
 
         s.initVerify(pubKey)
 
@@ -123,7 +123,7 @@ class SphincsPlusTest {
 
         try {
             val sigVer2 = KCryptoServices
-                    .verificationKey(pubKey.encoded, SPHINCSPlusGenSpec.verifyType)
+                    .verificationKey(pubKey.encoded, SLHDSAGenSpec.verifyType)
                     .signatureVerifier(FalconSigSpec())
 
             sigVer2.use {
