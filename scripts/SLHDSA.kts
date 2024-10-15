@@ -1,17 +1,17 @@
+import org.bouncycastle.asn1.DERPrintableString
+import org.bouncycastle.asn1.DERSequence
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
-import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.asn1.x509.GeneralName
-import org.bouncycastle.asn1.DERSequence
-import org.bouncycastle.asn1.DERPrintableString
+import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.kcrypto.cert.dsl.*
 import org.bouncycastle.kcrypto.cms.dsl.certificateManagementMessage
 import org.bouncycastle.kcrypto.dsl.*
 import org.bouncycastle.kutil.findBCProvider
 import org.bouncycastle.kutil.writePEMObject
-import java.io.OutputStreamWriter
 import java.io.FileWriter
+import java.io.OutputStreamWriter
 import java.math.BigInteger
 import java.util.*
 
@@ -60,7 +60,7 @@ var trustCert = certificate {
     extensions = trustExtensions
 
     signature {
-        SPHINCSPlus using trustKp.signingKey
+        SLHDSA using trustKp.signingKey
     }
 }
 
@@ -115,13 +115,13 @@ var caCert = certificate {
     extensions = caExtensions
 
     signature {
-        SPHINCSPlus using trustKp.signingKey
+        SLHDSA using trustKp.signingKey
     }
 }
 
 var eeKp = signingKeyPair {
     sphincsPlus {
-        parameterSet = "shake-256f-robust"
+        parameterSet = "slh-dsa-sha2-128f"
     }
 }
 
@@ -160,7 +160,7 @@ var eeCert = certificate {
     }
 
     signature {
-        SPHINCSPlus using caKp.signingKey
+        SLHDSA using caKp.signingKey
     }
 }
 
@@ -169,14 +169,14 @@ var certMgmt = certificateManagementMessage {
 }
 
 OutputStreamWriter(System.out).writePEMObject(eeKp.signingKey)
-FileWriter("sphincspluspriv.pem").writePEMObject(eeKp.signingKey)
+FileWriter("slhdsapriv.pem").writePEMObject(eeKp.signingKey)
 
 OutputStreamWriter(System.out).writePEMObject(eeCert)
-FileWriter("sphincspluseecert.pem").writePEMObject(eeCert)
+FileWriter("slhdsaeecert.pem").writePEMObject(eeCert)
 OutputStreamWriter(System.out).writePEMObject(caCert)
-FileWriter("sphincspluscacert.pem").writePEMObject(caCert)
+FileWriter("slhdsacacert.pem").writePEMObject(caCert)
 OutputStreamWriter(System.out).writePEMObject(trustCert)
-FileWriter("sphincsplustrustcert.pem").writePEMObject(trustCert)
+FileWriter("slhdsatrustcert.pem").writePEMObject(trustCert)
 // For a CMS file output with chain
 //OutputStreamWriter(System.out).writePEMObject(certMgmt)
 
