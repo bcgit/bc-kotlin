@@ -157,7 +157,7 @@ fun EncryptingKeyBuilder.rsa(block: RsaParams.() -> Unit) {
  * Initialize a MLKEM key pair.
  * @param block initialization block
  */
-fun EncryptingKeyBuilder.kyber(block: MLKEMParams.() -> Unit) {
+fun EncryptingKeyBuilder.mlKem(block: MLKEMParams.() -> Unit) {
     val p = MLKEMParams().apply(block)
 
     setSpec(MLKEMGenSpec(p.paramSet, KCryptoServices.secureRandom))
@@ -186,7 +186,7 @@ data class RsaParams(
 /**
  * MLKEM Parameters
  */
-data class MLKEMParams(var paramSet: String = "kyber512")
+data class MLKEMParams(var paramSet: String = "ML-KEM-512")
 
 /**
  * NTRU Parameters
