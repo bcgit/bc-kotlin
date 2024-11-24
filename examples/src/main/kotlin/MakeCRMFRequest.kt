@@ -25,7 +25,7 @@ fun main() {
 
     var sigKp = signingKeyPair {
         mlDsa {
-            parameterSet = "dilithium2"
+            parameterSet = "ML-DSA-44"
         }
     }
 
