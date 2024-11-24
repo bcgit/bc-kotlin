@@ -23,7 +23,7 @@ fun main() {
 
     var altKp = signingKeyPair {
         mlDsa {
-            parameterSet = "MLDSA2"
+            parameterSet = "ML-DSA-44"
         }
     }
 

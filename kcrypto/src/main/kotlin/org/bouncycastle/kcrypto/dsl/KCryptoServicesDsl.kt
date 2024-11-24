@@ -216,7 +216,7 @@ data class FalconParams(var parameterSet: String = "falcon-512")
 /**
  * MLDSA Parameters
  */
-data class MLDSAParams(var parameterSet: String = "dilithium5")
+data class MLDSAParams(var parameterSet: String = "ML-DSA-87")
 
 /**
  * SphincsPlus Parameters
