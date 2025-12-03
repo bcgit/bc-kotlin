@@ -144,13 +144,13 @@ class EncryptingKeyBuilder {
 fun encryptingKeyPair(block: EncryptingKeyBuilder.() -> Unit): EncryptingKeyPair = EncryptingKeyBuilder().apply(block).encryptingKeyPair()
 
 /**
- * Initialize a RSA key pair.
+ * Initialize a FrodoKEM key pair.
  * @param block initialization block
  */
-fun EncryptingKeyBuilder.rsa(block: RsaParams.() -> Unit) {
-    val p = RsaParams().apply(block)
+fun EncryptingKeyBuilder.frodoKem(block: FrodoKEMParams.() -> Unit) {
+    val p = FrodoKEMParams().apply(block)
 
-    setSpec(RSAGenSpec(p.keySize, KCryptoServices.secureRandom))
+    setSpec(FrodoKEMGenSpec(p.paramSet, KCryptoServices.secureRandom))
 }
 
 /**
@@ -174,6 +174,16 @@ fun EncryptingKeyBuilder.ntru(block: NtruParams.() -> Unit) {
 }
 
 /**
+ * Initialize a RSA key pair.
+ * @param block initialization block
+ */
+fun EncryptingKeyBuilder.rsa(block: RsaParams.() -> Unit) {
+    val p = RsaParams().apply(block)
+
+    setSpec(RSAGenSpec(p.keySize, KCryptoServices.secureRandom))
+}
+
+/**
  * RSA Parameters
  */
 data class RsaParams(
@@ -184,24 +194,19 @@ data class RsaParams(
 }
 
 /**
- * MLKEM Parameters
+ * Composite Parameters
  */
-data class MLKEMParams(var paramSet: String = "ML-KEM-512")
-
-/**
- * NTRU Parameters
- */
-data class NtruParams(var parameterSet: String = "ntruhrss701")
-
-/**
- * EC Parameters
- */
-data class EcParams(var curveName: String = "P-256")
+data class CompositeParams(var algorithmName: String = "MLDSA87-Ed448-SHAKE256")
 
 /**
  * DSA Parameters
  */
 data class DsaParams(var domainParameters: DSADomainParameters = DSADomainParameters.DEF_2048)
+
+/**
+ * EC Parameters
+ */
+data class EcParams(var curveName: String = "P-256")
 
 /**
  * EdDSA Parameters
@@ -214,16 +219,31 @@ data class EdDsaParams(var curveName: String = "ED25519")
 data class FalconParams(var parameterSet: String = "falcon-512")
 
 /**
- * MLDSA Parameters
+ * FrodoKEM Parameters
  */
-data class MLDSAParams(var parameterSet: String = "ML-DSA-87")
-
-/**
- * SphincsPlus Parameters
- */
-data class SLHDSAParams(var parameterSet: String = "shake_128f")
+data class FrodoKEMParams(var paramSet: String = "frodokem19888r3")
 
 /**
  * LMS Parameters
  */
 data class LMSParams(var sigParameterSet: String = "lms-sha256-n32-h10", var otsParameterSet: String = "sha256-n32-w2")
+
+/**
+ * MLDSA Parameters
+ */
+data class MLDSAParams(var parameterSet: String = "ML-DSA-87")
+
+/**
+ * MLKEM Parameters
+ */
+data class MLKEMParams(var paramSet: String = "ML-KEM-512")
+
+/**
+ * NTRU Parameters
+ */
+data class NtruParams(var parameterSet: String = "ntruhrss701")
+
+/**
+ * SLH-DSA Parameters
+ */
+data class SLHDSAParams(var parameterSet: String = "shake_128f")
