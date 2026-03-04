@@ -106,7 +106,17 @@ fun SigningKeyBuilder.mlDsa(block: MLDSAParams.() -> Unit) {
 }
 
 /**
- * Initialize an sphincs+ Key pair
+ * Initialize an Composite Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.composite(block: CompositeParams.() -> Unit) {
+    val p = CompositeParams().apply(block)
+
+    setSpec(CompositeGenSpec(p.algorithmName, KCryptoServices.secureRandom))
+}
+
+/**
+ * Initialize an slhDsa Key pair
  * @param block initialization block.
  */
 fun SigningKeyBuilder.slhDsa(block: SLHDSAParams.() -> Unit) {
@@ -116,7 +126,7 @@ fun SigningKeyBuilder.slhDsa(block: SLHDSAParams.() -> Unit) {
 }
 
 /**
- * Initialize an sphincs+ Key pair
+ * Initialize an lms Key pair
  * @param block initialization block.
  */
 fun SigningKeyBuilder.lms(block: LMSParams.() -> Unit) {

@@ -128,6 +128,11 @@ class KCryptoServices {
                     slhdsaGen.initialize(slhdsaSpec, keyGenSpec.random)
                     return SigningKeyPair(KeyPair(slhdsaGen.genKeyPair()))
                 }
+                is CompositeGenSpec -> {
+                    val compGen = _helper.createKeyPairGenerator(keyGenSpec.parameterSet)
+                    compGen.initialize(null, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(compGen.genKeyPair()))
+                }
                 is LMSGenSpec -> {
                     val lmsGen = _pqcHelper.createKeyPairGenerator("LMS")
                     val lmsSpec = LMSKeyGenParameterSpec.fromNames(keyGenSpec.sigParameterSet, keyGenSpec.otsParameterSet)

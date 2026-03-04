@@ -19,7 +19,7 @@ private val falcon_512 = BCObjectIdentifiers.falcon_512 // falcon.branch("1");
 private val falcon_1024 = BCObjectIdentifiers.falcon_1024 // falcon.branch("2");
 
 interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
-    
+
     fun validatedSpec(key: SigningKey): SigAlgSpec
 
     fun validatedSpec(key: VerificationKey): SigAlgSpec
@@ -48,18 +48,37 @@ interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
                 ml_dsa_44 -> MLDSASigSpec(algId)
                 ml_dsa_65 -> MLDSASigSpec(algId)
                 ml_dsa_87 -> MLDSASigSpec(algId)
-                slh_dsa_sha2_128f-> SLHDSASigSpec(algId)
+                slh_dsa_sha2_128f -> SLHDSASigSpec(algId)
                 slh_dsa_sha2_128s -> SLHDSASigSpec(algId)
                 slh_dsa_sha2_192f -> SLHDSASigSpec(algId)
                 slh_dsa_sha2_192s -> SLHDSASigSpec(algId)
                 slh_dsa_sha2_256f -> SLHDSASigSpec(algId)
                 slh_dsa_sha2_256s -> SLHDSASigSpec(algId)
-                slh_dsa_shake_128f-> SLHDSASigSpec(algId)
+                slh_dsa_shake_128f -> SLHDSASigSpec(algId)
                 slh_dsa_shake_128s -> SLHDSASigSpec(algId)
                 slh_dsa_shake_192f -> SLHDSASigSpec(algId)
                 slh_dsa_shake_192s -> SLHDSASigSpec(algId)
                 slh_dsa_shake_256f -> SLHDSASigSpec(algId)
                 slh_dsa_shake_256s -> SLHDSASigSpec(algId)
+                mldsa44_rsa2048_pss_sha256 -> CompositeSigSpec(algId)
+                mldsa44_rsa2048_pkcs15_sha256 -> CompositeSigSpec(algId)
+                mldsa44_ed25519_sha512 -> CompositeSigSpec(algId)
+                mldsa44_ecdsa_p256_sha256 -> CompositeSigSpec(algId)
+                mldsa65_rsa3072_pss_sha512 -> CompositeSigSpec(algId)
+                mldsa65_rsa3072_pkcs15_sha512 -> CompositeSigSpec(algId)
+                mldsa65_rsa4096_pss_sha512 -> CompositeSigSpec(algId)
+                mldsa65_rsa4096_pkcs15_sha512 -> CompositeSigSpec(algId)
+                mldsa65_ecdsa_p256_sha512 -> CompositeSigSpec(algId)
+                mldsa65_ecdsa_p384_sha512 -> CompositeSigSpec(algId)
+                mldsa65_ecdsa_brainpoolp256r1_sha512 -> CompositeSigSpec(algId)
+                mldsa65_ed25519_sha512 -> CompositeSigSpec(algId)
+                mldsa87_ecdsa_p384_sha256 -> CompositeSigSpec(algId)
+                mldsa87_ecdsa_brainpoolp384r1_sha512 -> CompositeSigSpec(algId)
+                mldsa87_ed448_shake256 -> CompositeSigSpec(algId)
+                mldsa87_rsa3072_pss_sha512 -> CompositeSigSpec(algId)
+                mldsa87_rsa4096_pss_sha512 -> CompositeSigSpec(algId)
+                mldsa87_ecdsa_p521_sha512 -> CompositeSigSpec(algId)
+
                 // SM3withSM2
                 ASN1ObjectIdentifier("1.2.156.10197.1.501") -> SM2SigSpec(Digest.SM3, id, algId)
                 else -> throw IllegalArgumentException("unknown algorithm: " + algId.algorithm)

@@ -93,7 +93,17 @@ class MLDSASigType: NoDigSigType
 }
 
 /**
- * DSL for SPHINCS+ signature type.
+ * DSL for COMPOSITE signature type.
+ */
+class CompositeSigType: NoDigSigType
+{
+    override fun getSigAlgSpec(): SigAlgSpec {
+        return CompositeSigSpec()
+    }
+}
+
+/**
+ * DSL for SLHDSA signature type.
  */
 class SLHDSASigType: NoDigSigType
 {
@@ -128,6 +138,7 @@ class SignatureBlock
     lateinit var signature: SignatureDetails
 
     val PKCS1v1dot5 = SignatureDetails(this, PKCS1SigType())
+    val COMPOSITE = SignatureDetails(this, CompositeSigType())
     val ECDSA = SignatureDetails(this, ECDSASigType())
     val DSA = SignatureDetails(this, DSASigType())
     val EdDSA = SignatureDetails(this, EdDSASigType())
