@@ -135,6 +135,16 @@ fun SigningKeyBuilder.lms(block: LMSParams.() -> Unit) {
     setSpec(LMSGenSpec(p.sigParameterSet, p.otsParameterSet, KCryptoServices.secureRandom))
 }
 
+/**
+ * Initialize an Mayo Key pair
+ * @param block initialization block.
+ */
+fun SigningKeyBuilder.mayo(block: MayoParams.() -> Unit) {
+    val p = MayoParams().apply(block)
+
+    setSpec(MayoGenSpec(p.parameterSet, KCryptoServices.secureRandom))
+}
+
 class EncryptingKeyBuilder {
     private lateinit var spec: EncPairGenSpec
 
@@ -257,3 +267,8 @@ data class NtruParams(var parameterSet: String = "ntruhrss701")
  * SLH-DSA Parameters
  */
 data class SLHDSAParams(var parameterSet: String = "shake_128f")
+
+/**
+ * Mayo Parameters
+ */
+data class MayoParams(var parameterSet: String = "mayo-1")

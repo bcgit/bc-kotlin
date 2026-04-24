@@ -16,6 +16,7 @@ import org.bouncycastle.kcrypto.spec.kdf.ScryptSpec
 import org.bouncycastle.kcrypto.spec.symmetric.*
 import org.bouncycastle.pqc.jcajce.spec.FalconParameterSpec
 import org.bouncycastle.pqc.jcajce.spec.LMSKeyGenParameterSpec
+import org.bouncycastle.pqc.jcajce.spec.MayoParameterSpec
 import org.bouncycastle.pqc.jcajce.spec.NTRUParameterSpec
 import java.security.Provider
 import java.security.SecureRandom
@@ -66,6 +67,7 @@ class KCryptoServices {
         internal fun isPQC(name: String): Boolean
         {
              return name.equals("FALCON", true) || name.startsWith("1.3.9999.3")
+                     || name.startsWith("MAYO") || name.startsWith("1.3.9999.8")
                      || name.startsWith(BCObjectIdentifiers.sphincsPlus.id)
                      || name.startsWith("1.3.6.1.4.1.2.267.12")
         }
@@ -127,6 +129,12 @@ class KCryptoServices {
                     val slhdsaSpec = SLHDSAParameterSpec.fromName(keyGenSpec.parameterSet)
                     slhdsaGen.initialize(slhdsaSpec, keyGenSpec.random)
                     return SigningKeyPair(KeyPair(slhdsaGen.genKeyPair()))
+                }
+                is MayoGenSpec -> {
+                    val mayoGen = _pqcHelper.createKeyPairGenerator("MAYO")
+                    val mayoSpec = MayoParameterSpec.fromName(keyGenSpec.parameterSet)
+                    mayoGen.initialize(mayoSpec, keyGenSpec.random)
+                    return SigningKeyPair(KeyPair(mayoGen.genKeyPair()))
                 }
                 is CompositeGenSpec -> {
                     val compGen = _helper.createKeyPairGenerator(keyGenSpec.parameterSet)

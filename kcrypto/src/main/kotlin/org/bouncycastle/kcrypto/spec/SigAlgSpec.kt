@@ -78,7 +78,10 @@ interface SigAlgSpec : AlgSpec<AlgorithmIdentifier> {
                 mldsa87_rsa3072_pss_sha512 -> CompositeSigSpec(algId)
                 mldsa87_rsa4096_pss_sha512 -> CompositeSigSpec(algId)
                 mldsa87_ecdsa_p521_sha512 -> CompositeSigSpec(algId)
-
+                BCObjectIdentifiers.mayo_1 -> MayoSigSpec(algId)
+                BCObjectIdentifiers.mayo_2 -> MayoSigSpec(algId)
+                BCObjectIdentifiers.mayo_3 -> MayoSigSpec(algId)
+                BCObjectIdentifiers.mayo_5 -> MayoSigSpec(algId)
                 // SM3withSM2
                 ASN1ObjectIdentifier("1.2.156.10197.1.501") -> SM2SigSpec(Digest.SM3, id, algId)
                 else -> throw IllegalArgumentException("unknown algorithm: " + algId.algorithm)

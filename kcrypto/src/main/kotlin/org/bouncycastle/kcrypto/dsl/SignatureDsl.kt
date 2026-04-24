@@ -123,6 +123,16 @@ class LMSSigType: NoDigSigType
 }
 
 /**
+ * DSL for Mayo signature type.
+ */
+class MayoSigType: NoDigSigType
+{
+    override fun getSigAlgSpec(): SigAlgSpec {
+        return MayoSigSpec()
+    }
+}
+
+/**
  * DSL for block whose methods will return a calculator or a pkcs10RequestBuilder
  */
 class SignatureBlock
@@ -147,6 +157,7 @@ class SignatureBlock
     val MLDSA = SignatureDetails(this, MLDSASigType())
     val SLHDSA = SignatureDetails(this, SLHDSASigType())
     val LMS = SignatureDetails(this, LMSSigType())
+    val MAYO = SignatureDetails(this, MayoSigType())
 
     val sha224 = Digest.SHA224
     val sha256 = Digest.SHA256
